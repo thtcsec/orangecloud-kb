@@ -1,0 +1,91 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+html {
+  @apply bg-background text-foreground antialiased;
+}
+
+body {
+  min-height: 100vh;
+}
+
+.markdown-body {
+  @apply leading-relaxed text-zinc-200;
+}
+
+.markdown-body h1 {
+  @apply mb-4 mt-8 text-3xl font-bold text-foreground;
+}
+
+.markdown-body h2 {
+  @apply mb-3 mt-6 text-2xl font-semibold text-foreground;
+}
+
+.markdown-body h3 {
+  @apply mb-2 mt-4 text-xl font-semibold;
+}
+
+.markdown-body p {
+  @apply mb-4;
+}
+
+.markdown-body ul,
+.markdown-body ol {
+  @apply mb-4 ml-6 list-disc;
+}
+
+.markdown-body ol {
+  @apply list-decimal;
+}
+
+.markdown-body a {
+  @apply text-accent hover:text-accent-hover underline-offset-4 hover:underline;
+}
+
+.markdown-body blockquote {
+  @apply my-4 border-l-4 border-accent pl-4 text-zinc-400;
+}
+
+.markdown-body table {
+  @apply mb-4 w-full border-collapse overflow-hidden rounded-lg border border-border;
+}
+
+.markdown-body th,
+.markdown-body td {
+  @apply border border-border px-3 py-2 text-left;
+}
+
+.markdown-body th {
+  @apply bg-surface-elevated font-semibold;
+}
+
+.markdown-body pre {
+  @apply mb-4 overflow-x-auto rounded-lg border border-border bg-black/40 p-4 font-mono text-sm;
+}
+
+.markdown-body code {
+  @apply rounded bg-black/40 px-1.5 py-0.5 font-mono text-sm text-accent-hover;
+}
+
+.markdown-body pre code {
+  @apply bg-transparent p-0 text-inherit;
+}
+
+.markdown-body hr {
+  @apply my-8 border-border;
+}
+
+input,
+textarea,
+select {
+  @apply bg-surface-elevated border border-border rounded-lg px-3 py-2 text-foreground outline-none transition focus:border-accent;
+}
+
+button:disabled {
+  @apply cursor-not-allowed opacity-50;
+}

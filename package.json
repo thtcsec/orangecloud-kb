@@ -1,0 +1,17 @@
+{
+  "name": "knowledge-base",
+  "private": true,
+  "scripts": {
+    "dev": "pnpm --parallel -r dev",
+    "dev:api": "pnpm --filter @kb/api-worker dev",
+    "dev:web": "pnpm --filter @kb/web dev",
+    "build": "pnpm -r build",
+    "typecheck": "pnpm -r typecheck",
+    "db:migrate:local": "pnpm --filter @kb/api-worker db:migrate:local",
+    "db:migrate:remote": "pnpm --filter @kb/api-worker db:migrate:remote"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "packageManager": "pnpm@9.15.0"
+}

@@ -1,9 +1,11 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { BookOpen, Home, MessageSquare, Plus, Settings } from "lucide-react";
 import { ThemeToggle } from "./ThemeToggle";
+import { useResolvedTheme } from "./ThemeProvider";
 
 const links = [
   { href: "/", label: "Dashboard", icon: Home, exact: true },
@@ -23,12 +25,31 @@ function isActive(pathname: string, href: string, exact?: boolean, matchNotes?: 
 
 export function Sidebar() {
   const pathname = usePathname();
+  const resolvedTheme = useResolvedTheme();
 
   return (
     <aside className="flex h-screen w-64 flex-col border-r border-border bg-surface p-4">
-      <div className="mb-8 px-2">
-        <p className="text-xs font-semibold uppercase tracking-widest text-accent">OrangeCloud</p>
-        <h1 className="text-lg font-bold text-foreground">Knowledge Base</h1>
+      <div className="relative mb-6 flex items-center justify-center h-16">
+        <Image
+          src="/logo-light.png"
+          alt="OrangeCloud Knowledge Base"
+          width={220}
+          height={60}
+          priority
+          className={`absolute transition-opacity duration-300 ease-in-out object-contain ${
+            resolvedTheme === "light" ? "opacity-100" : "opacity-0"
+          }`}
+        />
+        <Image
+          src="/logo-dark.png"
+          alt="OrangeCloud Knowledge Base"
+          width={220}
+          height={60}
+          priority
+          className={`absolute transition-opacity duration-300 ease-in-out object-contain ${
+            resolvedTheme === "dark" ? "opacity-100" : "opacity-0"
+          }`}
+        />
       </div>
 
       <nav className="flex flex-1 flex-col gap-1">
@@ -53,6 +74,13 @@ export function Sidebar() {
       </nav>
 
       <ThemeToggle />
+
+      <div className="mt-3 border-t border-border pt-3 px-2">
+        <p className="text-[10px] text-muted leading-relaxed">
+          Built by <span className="text-foreground font-medium">Trinh Hoang Tu</span> &amp; <span className="text-foreground font-medium">Le Sy Cuong</span>
+        </p>
+        <p className="text-[10px] text-muted mt-0.5">Cloudflare Solutions Research</p>
+      </div>
     </aside>
   );
 }

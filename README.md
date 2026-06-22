@@ -1,4 +1,12 @@
-# Orange Cloud KB — AI-Powered Internal Knowledge Base
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="logo-dark.png">
+    <source media="(prefers-color-scheme: light)" srcset="logo-light.png">
+    <img alt="Orange Cloud KB" src="logo-light.png" width="360">
+  </picture>
+</p>
+
+<h1 align="center">Orange Cloud KB — AI-Powered Internal Knowledge Base</h1>
 
 Nền tảng wiki nội bộ dạng **Markdown**, hỗ trợ **semantic search** (tìm kiếm ngữ nghĩa), **hybrid retrieval** (FTS5 + Vector), và **RAG chat** (hỏi đáp AI dựa trên tri thức nội bộ) — tất cả chạy trên hạ tầng **edge** của Cloudflare, tối ưu chi phí và tốc độ tải toàn cầu.
 

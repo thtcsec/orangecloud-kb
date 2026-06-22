@@ -1,209 +1,300 @@
-# Knowledge Base
+# Orange Cloud KB — AI-Powered Internal Knowledge Base
 
-Wiki nội bộ dạng markdown, hỗ trợ semantic search và RAG, chạy trên hạ tầng edge của Cloudflare.
+Nền tảng wiki nội bộ dạng **Markdown**, hỗ trợ **semantic search** (tìm kiếm ngữ nghĩa), **hybrid retrieval** (FTS5 + Vector), và **RAG chat** (hỏi đáp AI dựa trên tri thức nội bộ) — tất cả chạy trên hạ tầng **edge** của Cloudflare, tối ưu chi phí và tốc độ tải toàn cầu.
 
-## Người tham gia
+*(Repo nội bộ:* `orangecloud-kb` *— OrangeCloud chỉ là nickname dự án.)*
+
+Dự án được triển khai hoàn toàn trên nền tảng **Serverless Cloudflare-native** nhằm giảm tải hạ tầng quản trị, tối ưu chi phí vận hành, và đảm bảo tốc độ phản hồi cực nhanh tại biên mạng.
+
+---
+
+## 👨‍💻 Nhóm Thực Hiện (Authorship)
+
+Dự án được xây dựng và phát triển dưới dạng giải pháp nghiên cứu bởi:
 
 - **Trịnh Hoàng Tú** — Cloudflare Cloud Solutions Researcher Intern
 - **Lê Sỹ Cường** — Territory Account Executive
 
-## Tech Stack
+---
 
-| Tầng | Công nghệ |
-|------|-----------|
-| API | Hono trên Cloudflare Workers |
-| Frontend | Next.js 15 trên Cloudflare Pages |
-| Database | Cloudflare D1 (SQLite + FTS5) |
-| Storage | Cloudflare R2 |
-| Vector DB | Cloudflare Vectorize |
-| Embeddings | Workers AI (`@cf/baai/bge-small-en-v1.5`) |
-| Chat | OpenAI GPT |
+## ⚙️ Thiết Kế Kiến Trúc (Cloudflare Serverless Integration)
 
-## Cấu trúc monorepo
+Hệ thống được thiết kế để minh họa cách kết hợp các dịch vụ serverless của Cloudflare thành một nền tảng quản lý tri thức khép kín:
+
+1. **Cloudflare Workers + Hono**: API router hiệu năng cao, xử lý CRUD notes, authentication, file upload, và RAG pipeline. Worker tự động chunk nội dung → embed → upsert vector mỗi khi note được publish.
+2. **D1 + FTS5 (Full-Text Search)**: Lưu trữ dữ liệu quan hệ (notes, comments, embeddings sync tracking) với **FTS5 virtual table** được sync tự động qua triggers, phục vụ keyword search tức thì.
+3. **Cloudflare R2**: Lưu trữ file đính kèm (ảnh, PDF, tài liệu) — tích hợp trực tiếp vào Markdown editor, upload multipart tối đa 10 MB.
+4. **Cloudflare Vectorize + Workers AI**: Tự động sinh vector embeddings từ nội dung note qua mô hình `@cf/baai/bge-small-en-v1.5`, cập nhật vào Vectorize — phục vụ tìm kiếm ngữ nghĩa và RAG retrieval.
+5. **Hybrid Search (RRF)**: Kết hợp kết quả từ FTS5 (keyword) và Vectorize (semantic) bằng thuật toán **Reciprocal Rank Fusion**, đảm bảo recall tốt cho cả truy vấn chính xác lẫn truy vấn tự nhiên.
+6. **RAG Chat (OpenAI GPT + Streaming)**: Câu hỏi người dùng → hybrid search top-K chunks → GPT sinh câu trả lời **streaming** (SSE token-by-token), kèm danh sách source references.
+7. **Next.js 15 trên Cloudflare Pages**: Frontend SSR tại Edge thông qua `@cloudflare/next-on-pages`, hỗ trợ dark/light/system theme.
+
+---
+
+## 🚀 Tính Năng Chính
+
+- **Markdown Editor** đầy đủ: `@uiw/react-md-editor` + upload ảnh/PDF vào R2, Mermaid diagrams, syntax highlighting.
+- **Hybrid Search**: FTS5 + Vectorize, gộp bằng Reciprocal Rank Fusion (RRF) — chế độ `hybrid`, `semantic`, `keyword`.
+- **RAG Chat** (`/chat`): hỏi đáp AI streaming dựa trên toàn bộ knowledge base.
+- **Folder & Tag organization**: phân loại notes theo folder và tags, filter đa chiều.
+- **Comments**: thảo luận trực tiếp trên mỗi note.
+- **Attachments**: upload file đính kèm vào R2, chèn link trực tiếp trong markdown.
+- **Dark/Light/System theme**: toggle ở sidebar, không flash khi reload.
+- **Knowledge API**: endpoint chuẩn cho tích hợp Custom GPT / external tools (bearer token auth).
+- **OpenAPI spec**: tự động serve tại `/api/openapi.json` — import vào Custom GPT hoặc Postman.
+- **CI/CD**: GitHub Actions typecheck + build + auto-deploy khi có secrets.
+
+---
+
+## 📁 Cấu Trúc Monorepo (Directory Layout)
 
 ```
-apps/
-  api-worker/   # Hono API + RAG pipeline
-  web/          # Next.js frontend
-packages/
-  shared/       # Shared TypeScript types
+orangecloud-kb/
+├── apps/
+│   ├── api-worker/             # Hono API trên Cloudflare Workers (CRUD, RAG, Search, Chat)
+│   └── web/                    # Next.js 15 Frontend trên Cloudflare Pages
+├── packages/
+│   └── shared/                 # Shared TypeScript types (Note, Comment, Search, Chat)
+├── docs/                       # Tài liệu deploy & hướng dẫn
+└── .github/workflows/          # CI/CD pipeline
 ```
 
-## Bắt đầu nhanh
+---
 
-### 1. Cài dependencies
+## 🛠️ Hướng Dẫn Cài Đặt & Phát Triển (Local Setup)
+
+### Yêu Cầu Hệ Thống
+
+- **Node.js**: >= 20.x
+- **Package Manager**: `pnpm` (version quản lý qua `packageManager` field)
+- **Wrangler CLI**: đi kèm devDependencies, không cần cài global
+
+### 1. Cài đặt Dependencies
 
 ```bash
 pnpm install
 ```
 
-### 2. Cấu hình secrets
+### 2. Cấu hình Secrets (local dev)
 
 ```bash
 cp apps/api-worker/.dev.vars.example apps/api-worker/.dev.vars
+```
+
+Chỉnh `apps/api-worker/.dev.vars`:
+
+```
+ADMIN_PASSWORD=your-admin-password
+OPENAI_API_KEY=sk-...
+API_KEY=your-bearer-token-for-knowledge-api
+```
+
+Frontend:
+
+```bash
 cp apps/web/.env.example apps/web/.env.local
 ```
 
-Chỉnh sửa `apps/api-worker/.dev.vars`:
-
-- `ADMIN_PASSWORD` — mật khẩu đăng nhập admin (dùng cho CRUD notes)
-- `OPENAI_API_KEY` — dùng cho `/api/chat` (RAG)
-- `API_KEY` — bearer token cho Custom GPT / Knowledge API
-
-### 3. Tạo tài nguyên Cloudflare
-
-```bash
-# D1 database
-pnpm --filter @kb/api-worker db:create
-# Copy database_id vào apps/api-worker/wrangler.jsonc
-
-# Vectorize index (384 dimensions cho bge-small-en-v1.5)
-pnpm --filter @kb/api-worker vectorize:create
-
-# R2 bucket (qua dashboard hoặc wrangler)
-wrangler r2 bucket create knowledge-base-attachments
+```
+NEXT_PUBLIC_API_URL=http://localhost:8787
 ```
 
-### 4. Chạy migrations
+### 3. Tạo Database & Chạy Migrations (D1 local)
 
 ```bash
 pnpm db:migrate:local
 ```
 
-### 5. Khởi động dev servers
+### 4. Khởi động Dev Servers
 
 ```bash
 pnpm dev
 ```
 
-- API: http://localhost:8787
-- Web: http://localhost:3000
+*(Chạy song song: API Worker ở `localhost:8787`, Next.js ở `localhost:3000`)*
 
-> **Lưu ý:** `pnpm dev` chạy API ở chế độ **local** (CRUD + FTS hoạt động, embedding/Vectorize chưa có). Để test đầy đủ RAG với Workers AI + Vectorize, dùng `pnpm dev:remote` (cần `account_id` đúng trong `wrangler.jsonc`).
+> **Lưu ý:** `pnpm dev` chạy API ở chế độ **local** — CRUD + FTS hoạt động đầy đủ, embedding/Vectorize cần `pnpm dev:remote` (yêu cầu `account_id` đúng trong `wrangler.jsonc`).
 
-## Xử lý lỗi dev
+---
 
-### `Internal Server Error` trên localhost:3000
+## 🌐 Triển Khai Lên Cloudflare (Production Deployment)
 
-Thường do **process Next.js cũ** vẫn chiếm port 3000 (trả 500) trong khi `pnpm dev` không start được web mới.
+### 1. Tạo Tài Nguyên
 
 ```bash
-# Tự động (đã có sẵn trong predev)
-pnpm dev
+# D1 Database
+pnpm --filter @kb/api-worker db:create
 
-# Hoặc kill thủ công
-npx kill-port 3000 8787
-pnpm dev
+# Vectorize Index (384 dimensions cho bge-small-en-v1.5)
+pnpm --filter @kb/api-worker vectorize:create
+
+# R2 Bucket
+wrangler r2 bucket create knowledge-base-attachments
 ```
 
-Đảm bảo `apps/web/.env.local` trỏ đúng API:
-```
-NEXT_PUBLIC_API_URL=http://localhost:8787
-```
+*Copy `database_id` vào `apps/api-worker/wrangler.jsonc`.*
 
-### `Failed to start the remote proxy session` / `unable to select account`
-
-Wrangler thấy nhiều Cloudflare account và không chọn được. Sửa một trong hai cách:
-
-1. **Chạy local (khuyên dùng khi mới bắt đầu):**
-   ```bash
-   pnpm dev
-   ```
-
-2. **Chạy remote đầy đủ RAG:** mở `apps/api-worker/wrangler.jsonc`, đặt `account_id` đúng account của bạn:
-   - `Cloudspace`: `4c15704ef706b9c8954cd6f9feb678d8`
-   - `Tht.csec2005@gmail.com`: `d26517432bff17b8889b98cc366c70f1`
-
-   Sau đó:
-   ```bash
-   pnpm dev:remote
-   ```
-
-Hoặc set biến môi trường trước khi chạy:
-```bash
-$env:CLOUDFLARE_ACCOUNT_ID="4c15704ef706b9c8954cd6f9feb678d8"
-pnpm dev:remote
-```
-
-## API Endpoints
-
-### Notes (đọc công khai, ghi cần auth)
-
-| Method | Path | Mô tả |
-|--------|------|-------|
-| GET | `/api/notes` | Danh sách notes (lọc: folder, tag, status, q) |
-| POST | `/api/notes` | Tạo note (tự động embed nếu published) |
-| GET | `/api/notes/:id` | Lấy một note |
-| PUT | `/api/notes/:id` | Cập nhật note (re-embed nếu published) |
-| DELETE | `/api/notes/:id` | Xoá note + vectors |
-| GET | `/api/notes/:id/comments` | Danh sách comments |
-| POST | `/api/notes/:id/comments` | Thêm comment |
-
-### RAG / Knowledge
-
-| Method | Path | Auth | Mô tả |
-|--------|------|------|-------|
-| POST | `/api/chat` | — | RAG chat — `{ stream: true }` cho SSE streaming |
-| GET | `/api/knowledge/search?q=` | API_KEY | Hybrid search (mặc định), `?mode=semantic\|keyword` |
-| GET | `/api/knowledge/context` | API_KEY | Dump toàn bộ nội dung dạng text |
-| GET | `/api/knowledge/notes` | API_KEY | Danh sách notes |
-| GET | `/api/knowledge/notes/:id` | API_KEY | Lấy một note |
-
-### Attachments (R2)
-
-| Method | Path | Auth | Mô tả |
-|--------|------|------|-------|
-| POST | `/api/attachments` | Admin | Upload file (multipart, max 10MB) |
-| GET | `/api/attachments/:key` | — | Tải file từ R2 |
-
-OpenAPI spec: `GET /api/openapi.json`
-
-## Tính năng nâng cao
-
-- **Hybrid search:** FTS5 + Vectorize, gộp bằng Reciprocal Rank Fusion (RRF)
-- **Streaming chat:** SSE token-by-token tại `/chat`
-- **Markdown editor:** `@uiw/react-md-editor` + upload ảnh/PDF vào R2
-- **Light/Dark/System theme** ở sidebar
-
-## RAG Pipeline
-
-```
-Note (published) → Chunk (~500 tokens, overlap 50)
-                 → Embed (bge-small-en-v1.5)
-                 → Upsert Vectorize (id = noteId::chunkIndex)
-```
-
-Retrieval: câu hỏi → hybrid search (FTS + vector, RRF) → top-K → GPT streaming.
-
-## Deploy
-
-Chi tiết: [docs/DEPLOY.md](docs/DEPLOY.md)
-
-**Lưu ý:** Auto-deploy qua GitHub Actions cần cấp quyền repo + thêm secrets `CF_API_TOKEN`, `CF_ACCOUNT_ID`, `NEXT_PUBLIC_API_URL`. CI vẫn chạy typecheck/build ngay cả khi chưa có secrets.
-
-### API Worker
+### 2. Bind Secrets (production)
 
 ```bash
 cd apps/api-worker
 wrangler secret put ADMIN_PASSWORD
 wrangler secret put OPENAI_API_KEY
 wrangler secret put API_KEY
-pnpm db:migrate:remote
-wrangler deploy
 ```
 
-### Frontend (Cloudflare Pages)
+### 3. Migrations Remote
 
 ```bash
-cd apps/web
-# Đặt NEXT_PUBLIC_API_URL trỏ tới worker URL
-pnpm build
-pnpm pages:build
-pnpm pages:deploy
+pnpm db:migrate:remote
 ```
 
-## Tích hợp Custom GPT
+### 4. Deploy
+
+```bash
+# API Worker
+pnpm --filter @kb/api-worker deploy
+
+# Frontend (Cloudflare Pages)
+cd apps/web
+NEXT_PUBLIC_API_URL=https://your-worker.workers.dev pnpm build
+npx wrangler pages deploy .next --project-name=knowledge-base-web
+```
+
+### 5. GitHub Actions (tự động)
+
+Thêm Secrets vào repo Settings → Secrets:
+
+| Secret | Mô tả |
+|--------|-------|
+| `CF_API_TOKEN` | Cloudflare API token (Workers + Pages + D1) |
+| `CF_ACCOUNT_ID` | Account ID triển khai |
+| `NEXT_PUBLIC_API_URL` | URL worker sau deploy |
+
+Push lên `main` → CI chạy typecheck + build → deploy tự động khi có secrets.
+
+---
+
+## 🔐 Quản Lý Secrets (Nội Bộ)
+
+**Nguyên tắc:** mỗi loại secret chỉ lưu **một nơi** — không trùng lặp.
+
+| Loại | Lưu ở đâu | Dùng cho |
+|------|-----------|----------|
+| `CLOUDFLARE_API_TOKEN` | **GitHub Secrets** | CI deploy (Actions) |
+| `OPENAI_API_KEY` | **Cloudflare Secrets** (Worker) | Runtime RAG chat |
+| `ADMIN_PASSWORD` | **Cloudflare Secrets** (Worker) | Admin auth |
+| `API_KEY` | **Cloudflare Secrets** (Worker) | Knowledge API bearer token |
+| Dev secrets | `apps/api-worker/.dev.vars` (gitignored) | `pnpm dev` local |
+
+**Không làm:**
+- Không commit `.dev.vars` hay `.env.local`
+- Không lưu API key trong D1 hoặc frontend code
+
+---
+
+## 📖 API Endpoints
+
+### Notes (đọc công khai, ghi cần auth)
+
+| Method | Path | Mô tả |
+|--------|------|-------|
+| GET | `/api/notes` | Danh sách notes (filter: folder, tag, status, q) |
+| POST | `/api/notes` | Tạo note (auto-embed nếu published) |
+| GET | `/api/notes/:id` | Chi tiết note |
+| PUT | `/api/notes/:id` | Cập nhật note (re-embed nếu published) |
+| DELETE | `/api/notes/:id` | Xoá note + vectors |
+| GET | `/api/notes/:id/comments` | Danh sách comments |
+| POST | `/api/notes/:id/comments` | Thêm comment |
+
+### RAG & Knowledge API
+
+| Method | Path | Auth | Mô tả |
+|--------|------|------|-------|
+| POST | `/api/chat` | — | RAG chat (`stream: true` cho SSE) |
+| GET | `/api/knowledge/search?q=` | API_KEY | Hybrid search (mode: hybrid/semantic/keyword) |
+| GET | `/api/knowledge/context` | API_KEY | Dump toàn bộ KB dạng text |
+| GET | `/api/knowledge/notes` | API_KEY | List notes |
+| GET | `/api/knowledge/notes/:id` | API_KEY | Get note |
+
+### Attachments (R2)
+
+| Method | Path | Auth | Mô tả |
+|--------|------|------|-------|
+| POST | `/api/attachments` | Admin | Upload file (multipart, max 10 MB) |
+| GET | `/api/attachments/:key` | — | Download file từ R2 |
+
+OpenAPI spec: `GET /api/openapi.json`
+
+---
+
+## 🔄 RAG Pipeline
+
+```
+Note (published) → Chunk (~500 tokens, overlap 50)
+                 → Embed (bge-small-en-v1.5 via Workers AI)
+                 → Upsert Vectorize (id = noteId::chunkIndex)
+```
+
+**Retrieval:** câu hỏi → hybrid search (FTS5 + Vectorize, RRF merge) → top-K chunks → OpenAI GPT streaming response.
+
+---
+
+## 🧪 Kiểm Thử End-to-End (Local Testing Flow)
+
+### Bước 1: Khởi động
+
+```bash
+pnpm dev
+```
+
+### Bước 2: Tạo note qua API hoặc UI
+
+```bash
+curl -X POST http://localhost:8787/api/notes \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer your-admin-password" \
+  -d '{"title":"Test Note","content":"# Hello\nThis is a test note about Cloudflare Workers.","author":"admin","status":"published"}'
+```
+
+### Bước 3: Test search
+
+```bash
+# Full-text search
+curl "http://localhost:8787/api/notes?q=cloudflare"
+
+# Hybrid search (cần remote mode cho vector)
+curl -H "X-API-Key: your-api-key" "http://localhost:8787/api/knowledge/search?q=cloudflare+workers"
+```
+
+### Bước 4: Test RAG chat
+
+```bash
+curl -X POST http://localhost:8787/api/chat \
+  -H "Content-Type: application/json" \
+  -d '{"question":"What do we know about Cloudflare Workers?","stream":false}'
+```
+
+### Bước 5: Truy cập Frontend
+
+- Trang chính: `http://localhost:3000`
+- Chat: `http://localhost:3000/chat`
+- Settings: `http://localhost:3000/settings`
+
+---
+
+## 🗂️ Tích Hợp Custom GPT
 
 1. Import OpenAPI spec từ `{API_URL}/api/openapi.json`
-2. Cấu hình authentication: Bearer token = `API_KEY` của bạn
-3. Các action khả dụng: search, get context, list/get notes
+2. Authentication: Bearer token = `API_KEY`
+3. Actions khả dụng: search, get context, list/get notes
+
+---
+
+## 📝 Ghi Chú Kỹ Thuật
+
+- **Chunk strategy**: ~500 tokens/chunk, overlap 50 tokens — đảm bảo context liền mạch.
+- **FTS5 triggers**: auto-sync qua SQLite triggers, zero-config.
+- **Vector cleanup**: xoá note sẽ tự động xoá vectors tương ứng trong Vectorize.
+- **Streaming**: SSE chunked response cho chat, frontend render token-by-token.
+- **Theme persistence**: `localStorage` + inject script trước hydration → không flash.

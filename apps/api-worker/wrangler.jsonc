@@ -4,8 +4,10 @@
   "main": "src/index.ts",
   "compatibility_date": "2025-06-01",
   "compatibility_flags": ["nodejs_compat"],
-  // Set your Cloudflare account ID for remote AI/Vectorize in dev
-  // "account_id": "YOUR_ACCOUNT_ID",
+  // Đổi account_id nếu cần dùng account khác:
+  // Cloudspace: 4c15704ef706b9c8954cd6f9feb678d8
+  // Tht.csec2005@gmail.com: d26517432bff17b8889b98cc366c70f1
+  "account_id": "4c15704ef706b9c8954cd6f9feb678d8",
   "vars": {
     "EMBEDDING_MODEL": "@cf/baai/bge-small-en-v1.5",
     "CHUNK_SIZE": "500",

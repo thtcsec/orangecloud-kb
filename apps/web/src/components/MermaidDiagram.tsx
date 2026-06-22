@@ -1,32 +1,47 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useId, useRef } from "react";
 import mermaid from "mermaid";
-
-mermaid.initialize({
-  startOnLoad: false,
-  theme: "dark",
-  securityLevel: "loose",
-});
+import { useResolvedTheme } from "./ThemeProvider";
 
 export function MermaidDiagram({ chart }: { chart: string }) {
   const ref = useRef<HTMLDivElement>(null);
+  const theme = useResolvedTheme();
+  const baseId = useId().replace(/:/g, "");
 
   useEffect(() => {
     if (!ref.current) return;
-    const id = `mermaid-${Math.random().toString(36).slice(2)}`;
+
+    mermaid.initialize({
+      startOnLoad: false,
+      theme: theme === "dark" ? "dark" : "default",
+      securityLevel: "loose",
+    });
+
+    const renderId = `mermaid-${baseId}`;
+    let cancelled = false;
 
     mermaid
-      .render(id, chart)
+      .render(renderId, chart)
       .then(({ svg }) => {
-        if (ref.current) ref.current.innerHTML = svg;
+        if (!cancelled && ref.current) ref.current.innerHTML = svg;
       })
       .catch((err) => {
-        if (ref.current) {
+        if (!cancelled && ref.current) {
           ref.current.textContent = `Mermaid error: ${err instanceof Error ? err.message : "unknown"}`;
         }
       });
-  }, [chart]);
 
-  return <div ref={ref} className="my-4 overflow-x-auto rounded-lg border border-border bg-black/20 p-4" />;
+    return () => {
+      cancelled = true;
+    };
+  }, [chart, theme, baseId]);
+
+  return (
+    <div
+      ref={ref}
+      className="my-4 overflow-x-auto rounded-lg border border-border bg-surface-elevated p-4"
+      suppressHydrationWarning
+    />
+  );
 }

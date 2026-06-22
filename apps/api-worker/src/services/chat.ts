@@ -1,6 +1,6 @@
 import type { ChatResponse } from "@kb/shared";
 import type { Env } from "../env";
-import { semanticSearch } from "./rag";
+import { buildContext, retrieveSources, SYSTEM_PROMPT } from "./chat-internals";
 
 interface OpenAIChatResponse {
   choices: Array<{
@@ -13,31 +13,13 @@ interface OpenAIChatResponse {
   };
 }
 
-const SYSTEM_PROMPT = `You are a helpful internal knowledge base assistant. Answer questions based ONLY on the provided context from company notes and documentation.
-
-Rules:
-- If the context does not contain enough information, say so clearly.
-- Cite note titles when referencing specific information.
-- Be concise and accurate.
-- Use markdown formatting when helpful.`;
-
 export async function chatWithRag(
   env: Env,
   question: string,
   topK = 5,
 ): Promise<ChatResponse> {
-  const sources = await semanticSearch(env, question, topK);
-
-  const context = sources
-    .map(
-      (s, i) =>
-        `[Source ${i + 1}] ${s.title} (folder: ${s.folder ?? "none"}, score: ${s.score.toFixed(3)})\n${s.text}`,
-    )
-    .join("\n\n");
-
-  const userMessage = context
-    ? `Context:\n${context}\n\nQuestion: ${question}`
-    : `No relevant context found in the knowledge base.\n\nQuestion: ${question}`;
+  const sources = await retrieveSources(env, question, topK);
+  const userMessage = buildContext(sources, question);
 
   const response = await fetch("https://api.openai.com/v1/chat/completions", {
     method: "POST",

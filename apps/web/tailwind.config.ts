@@ -6,16 +6,16 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        background: "#0a0a0b",
-        surface: "#111113",
-        "surface-elevated": "#18181b",
-        border: "#27272a",
-        muted: "#71717a",
-        foreground: "#fafafa",
+        background: "var(--color-background)",
+        surface: "var(--color-surface)",
+        "surface-elevated": "var(--color-surface-elevated)",
+        border: "var(--color-border)",
+        muted: "var(--color-muted)",
+        foreground: "var(--color-foreground)",
         accent: {
-          DEFAULT: "#f97316",
-          hover: "#fb923c",
-          muted: "#7c2d12",
+          DEFAULT: "var(--color-accent)",
+          hover: "var(--color-accent-hover)",
+          muted: "var(--color-accent-muted)",
         },
       },
       fontFamily: {

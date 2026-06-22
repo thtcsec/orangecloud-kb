@@ -2,7 +2,8 @@ import { Hono } from "hono";
 import type { Env } from "../env";
 import { requireApiKey } from "./auth";
 import { errorResponse, jsonResponse } from "../lib/utils";
-import { buildKnowledgeContext, semanticSearch } from "../services/rag";
+import { buildKnowledgeContext } from "../services/rag";
+import { hybridSearch } from "../services/hybrid-search";
 import * as notesService from "../services/notes";
 
 export const knowledgeRoutes = new Hono<{ Bindings: Env }>();
@@ -17,9 +18,23 @@ knowledgeRoutes.get("/search", async (c) => {
   const q = c.req.query("q");
   if (!q?.trim()) return errorResponse("Query parameter q is required", 400);
 
+  const mode = c.req.query("mode") ?? "hybrid";
   const topK = Number.parseInt(c.req.query("topK") ?? "5", 10);
-  const results = await semanticSearch(c.env, q, topK);
-  return jsonResponse({ results });
+
+  const results =
+    mode === "semantic"
+      ? await (async () => {
+          const { semanticSearch } = await import("../services/rag");
+          return semanticSearch(c.env, q, topK);
+        })()
+      : mode === "keyword"
+        ? await (async () => {
+            const { keywordSearch } = await import("../services/hybrid-search");
+            return keywordSearch(c.env.DB, q, topK);
+          })()
+        : await hybridSearch(c.env, q, topK);
+
+  return jsonResponse({ results, mode: mode === "semantic" || mode === "keyword" ? mode : "hybrid" });
 });
 
 knowledgeRoutes.get("/context", async (c) => {

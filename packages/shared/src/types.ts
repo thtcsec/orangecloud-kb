@@ -50,6 +50,7 @@ export interface NoteListQuery {
 export interface ChatRequest {
   question: string;
   topK?: number;
+  stream?: boolean;
 }
 
 export interface ChatResponse {
@@ -69,6 +70,14 @@ export interface SearchResult {
 
 export interface KnowledgeSearchResponse {
   results: SearchResult[];
+  mode?: "hybrid" | "semantic" | "keyword";
+}
+
+export interface AttachmentUploadResponse {
+  key: string;
+  url: string;
+  contentType: string;
+  size: number;
 }
 
 export interface ApiError {

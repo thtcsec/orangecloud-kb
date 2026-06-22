@@ -1,7 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useState } from "react";
+import dynamic from "next/dynamic";
 import { MarkdownRenderer } from "./MarkdownRenderer";
+import { api, API_URL } from "@/lib/api";
+import { useTheme } from "./ThemeProvider";
+import { ImagePlus, Loader2 } from "lucide-react";
+import "@uiw/react-md-editor/markdown-editor.css";
+import "@uiw/react-markdown-preview/markdown.css";
+
+const MDEditor = dynamic(() => import("@uiw/react-md-editor"), { ssr: false });
 
 interface MarkdownEditorProps {
   value: string;
@@ -11,38 +19,98 @@ interface MarkdownEditorProps {
 
 export function MarkdownEditor({ value, onChange, placeholder }: MarkdownEditorProps) {
   const [tab, setTab] = useState<"write" | "preview">("write");
+  const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState("");
+  const { resolvedTheme, mounted } = useTheme();
+
+  const insertAtCursor = useCallback(
+    (snippet: string) => {
+      onChange(value ? `${value}\n\n${snippet}` : snippet);
+    },
+    [onChange, value],
+  );
+
+  async function handleUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploading(true);
+    setUploadError("");
+
+    try {
+      const result = await api.attachments.upload(file);
+      const isImage = result.contentType.startsWith("image/");
+      const markdown = isImage
+        ? `![${file.name}](${result.absoluteUrl})`
+        : `[${file.name}](${result.absoluteUrl})`;
+      insertAtCursor(markdown);
+      setTab("write");
+    } catch (err) {
+      setUploadError(err instanceof Error ? err.message : "Upload failed");
+    } finally {
+      setUploading(false);
+      e.target.value = "";
+    }
+  }
+
+  const colorMode = mounted && resolvedTheme === "light" ? "light" : "dark";
 
   return (
     <div className="flex h-full flex-col rounded-xl border border-border bg-surface">
-      <div className="flex border-b border-border">
-        <button
-          type="button"
-          onClick={() => setTab("write")}
-          className={`px-4 py-2 text-sm ${tab === "write" ? "border-b-2 border-accent text-accent" : "text-muted"}`}
-        >
-          Write
-        </button>
-        <button
-          type="button"
-          onClick={() => setTab("preview")}
-          className={`px-4 py-2 text-sm ${tab === "preview" ? "border-b-2 border-accent text-accent" : "text-muted"}`}
-        >
-          Preview
-        </button>
+      <div className="flex items-center justify-between border-b border-border">
+        <div className="flex">
+          <button
+            type="button"
+            onClick={() => setTab("write")}
+            className={`px-4 py-2 text-sm ${tab === "write" ? "border-b-2 border-accent text-accent" : "text-muted"}`}
+          >
+            Write
+          </button>
+          <button
+            type="button"
+            onClick={() => setTab("preview")}
+            className={`px-4 py-2 text-sm ${tab === "preview" ? "border-b-2 border-accent text-accent" : "text-muted"}`}
+          >
+            Preview
+          </button>
+        </div>
+
+        <label className="mr-3 flex cursor-pointer items-center gap-2 text-sm text-muted hover:text-accent">
+          {uploading ? <Loader2 size={16} className="animate-spin" /> : <ImagePlus size={16} />}
+          {uploading ? "Uploading..." : "Attach file"}
+          <input
+            type="file"
+            className="hidden"
+            accept="image/*,.pdf,.txt,.md"
+            onChange={handleUpload}
+            disabled={uploading}
+          />
+        </label>
       </div>
 
+      {uploadError && <p className="border-b border-border px-4 py-2 text-sm text-red-500">{uploadError}</p>}
+
       {tab === "write" ? (
-        <textarea
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          placeholder={placeholder}
-          className="min-h-[500px] flex-1 resize-none border-0 bg-transparent p-4 font-mono text-sm focus:ring-0"
-        />
+        <div className="min-h-[500px] flex-1 [&_.w-md-editor]:min-h-[500px] [&_.w-md-editor]:bg-surface [&_.w-md-editor-toolbar]:bg-surface-elevated [&_.w-md-editor-toolbar]:border-border">
+          <MDEditor
+            value={value}
+            onChange={(v) => onChange(v ?? "")}
+            preview="edit"
+            height={500}
+            textareaProps={{ placeholder }}
+            data-color-mode={colorMode}
+            visibleDragbar={false}
+          />
+        </div>
       ) : (
         <div className="min-h-[500px] flex-1 overflow-auto p-4">
           {value ? <MarkdownRenderer content={value} /> : <p className="text-muted">Nothing to preview</p>}
         </div>
       )}
+
+      <p className="border-t border-border px-4 py-2 text-xs text-muted">
+        Upload ảnh/PDF qua R2 — cần đăng nhập admin tại Settings. API: {API_URL}
+      </p>
     </div>
   );
 }

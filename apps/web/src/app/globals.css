@@ -3,6 +3,32 @@
 @tailwind utilities;
 
 :root {
+  --color-background: #f8fafc;
+  --color-surface: #ffffff;
+  --color-surface-elevated: #f1f5f9;
+  --color-border: #e2e8f0;
+  --color-muted: #64748b;
+  --color-foreground: #0f172a;
+  --color-accent: #ea580c;
+  --color-accent-hover: #f97316;
+  --color-accent-muted: #ffedd5;
+  --color-code-bg: #f1f5f9;
+  --color-pre-bg: #f8fafc;
+  color-scheme: light;
+}
+
+.dark {
+  --color-background: #0a0a0b;
+  --color-surface: #111113;
+  --color-surface-elevated: #18181b;
+  --color-border: #27272a;
+  --color-muted: #71717a;
+  --color-foreground: #fafafa;
+  --color-accent: #f97316;
+  --color-accent-hover: #fb923c;
+  --color-accent-muted: #7c2d12;
+  --color-code-bg: rgba(0, 0, 0, 0.4);
+  --color-pre-bg: rgba(0, 0, 0, 0.4);
   color-scheme: dark;
 }
 
@@ -15,7 +41,8 @@ body {
 }
 
 .markdown-body {
-  @apply leading-relaxed text-zinc-200;
+  @apply leading-relaxed;
+  color: var(--color-foreground);
 }
 
 .markdown-body h1 {
@@ -48,7 +75,7 @@ body {
 }
 
 .markdown-body blockquote {
-  @apply my-4 border-l-4 border-accent pl-4 text-zinc-400;
+  @apply my-4 border-l-4 border-accent pl-4 text-muted;
 }
 
 .markdown-body table {
@@ -65,11 +92,13 @@ body {
 }
 
 .markdown-body pre {
-  @apply mb-4 overflow-x-auto rounded-lg border border-border bg-black/40 p-4 font-mono text-sm;
+  @apply mb-4 overflow-x-auto rounded-lg border border-border p-4 font-mono text-sm;
+  background: var(--color-pre-bg);
 }
 
 .markdown-body code {
-  @apply rounded bg-black/40 px-1.5 py-0.5 font-mono text-sm text-accent-hover;
+  @apply rounded px-1.5 py-0.5 font-mono text-sm text-accent-hover;
+  background: var(--color-code-bg);
 }
 
 .markdown-body pre code {
@@ -78,6 +107,40 @@ body {
 
 .markdown-body hr {
   @apply my-8 border-border;
+}
+
+/* MD Editor theme overrides */
+.w-md-editor {
+  background-color: var(--color-surface) !important;
+  color: var(--color-foreground) !important;
+}
+
+.w-md-editor-toolbar {
+  background-color: var(--color-surface-elevated) !important;
+  border-color: var(--color-border) !important;
+}
+
+.w-md-editor-text-pre,
+.w-md-editor-text-input,
+.w-md-editor-text {
+  font-family: var(--font-geist-mono), ui-monospace, monospace !important;
+}
+
+.dark .w-md-editor-text-pre > code,
+.dark .w-md-editor-text-input {
+  color: var(--color-foreground) !important;
+}
+
+/* highlight.js — light */
+.markdown-body pre code.hljs {
+  background: #f6f8fa;
+  color: #24292f;
+}
+
+/* highlight.js — dark */
+.dark .markdown-body pre code.hljs {
+  background: #0d1117;
+  color: #c9d1d9;
 }
 
 input,

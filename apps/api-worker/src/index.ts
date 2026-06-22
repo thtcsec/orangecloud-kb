@@ -5,6 +5,7 @@ import { authRoutes } from "./routes/auth";
 import { notesRoutes } from "./routes/notes";
 import { knowledgeRoutes } from "./routes/knowledge";
 import { chatRoutes } from "./routes/chat";
+import { attachmentsRoutes } from "./routes/attachments";
 import { openapiRoutes } from "./routes/openapi";
 import { errorResponse } from "./lib/utils";
 
@@ -26,6 +27,7 @@ app.route("/api/auth", authRoutes);
 app.route("/api/notes", notesRoutes);
 app.route("/api/knowledge", knowledgeRoutes);
 app.route("/api/chat", chatRoutes);
+app.route("/api/attachments", attachmentsRoutes);
 app.route("/api/openapi.json", openapiRoutes);
 
 app.onError((err, c) => {

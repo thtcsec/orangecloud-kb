@@ -3,15 +3,23 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { BookOpen, Home, MessageSquare, Plus, Settings } from "lucide-react";
-import { motion } from "framer-motion";
+import { ThemeToggle } from "./ThemeToggle";
 
 const links = [
-  { href: "/", label: "Dashboard", icon: Home },
-  { href: "/notes", label: "Notes", icon: BookOpen },
+  { href: "/", label: "Dashboard", icon: Home, exact: true },
+  { href: "/notes", label: "Notes", icon: BookOpen, matchNotes: true },
   { href: "/notes/new", label: "New Note", icon: Plus },
   { href: "/chat", label: "Chat", icon: MessageSquare },
   { href: "/settings", label: "Settings", icon: Settings },
 ];
+
+function isActive(pathname: string, href: string, exact?: boolean, matchNotes?: boolean): boolean {
+  if (exact) return pathname === href;
+  if (matchNotes) {
+    return pathname === "/notes" || (pathname.startsWith("/notes/") && !pathname.startsWith("/notes/new"));
+  }
+  return pathname === href || pathname.startsWith(`${href}/`);
+}
 
 export function Sidebar() {
   const pathname = usePathname();
@@ -24,32 +32,27 @@ export function Sidebar() {
       </div>
 
       <nav className="flex flex-1 flex-col gap-1">
-        {links.map(({ href, label, icon: Icon }) => {
-          const active = pathname === href || (href !== "/" && pathname.startsWith(href) && href !== "/notes/new");
-          const isNotes = href === "/notes";
-          const notesActive = isNotes && (pathname === "/notes" || (pathname.startsWith("/notes/") && !pathname.startsWith("/notes/new")));
+        {links.map(({ href, label, icon: Icon, exact, matchNotes }) => {
+          const active = isActive(pathname, href, exact, matchNotes);
 
           return (
-            <Link key={href} href={href} className="relative">
-              {(active || notesActive) && (
-                <motion.span
-                  layoutId="sidebar-active"
-                  className="absolute inset-0 rounded-lg bg-accent/10 border border-accent/20"
-                  transition={{ type: "spring", bounce: 0.2, duration: 0.4 }}
-                />
-              )}
-              <span
-                className={`relative flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition ${
-                  active || notesActive ? "text-accent" : "text-zinc-400 hover:text-foreground"
-                }`}
-              >
-                <Icon size={18} />
-                {label}
-              </span>
+            <Link
+              key={href}
+              href={href}
+              className={`relative flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition ${
+                active
+                  ? "bg-accent/10 text-accent border border-accent/20"
+                  : "text-muted hover:bg-surface-elevated hover:text-foreground"
+              }`}
+            >
+              <Icon size={18} />
+              {label}
             </Link>
           );
         })}
       </nav>
+
+      <ThemeToggle />
     </aside>
   );
 }

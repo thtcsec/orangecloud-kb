@@ -2,8 +2,11 @@
   "name": "knowledge-base",
   "private": true,
   "scripts": {
+    "predev": "npx --yes kill-port 3000 8787",
     "dev": "pnpm --parallel -r dev",
+    "dev:remote": "pnpm --parallel --filter @kb/api-worker dev:remote --filter @kb/web dev",
     "dev:api": "pnpm --filter @kb/api-worker dev",
+    "dev:api:remote": "pnpm --filter @kb/api-worker dev:remote",
     "dev:web": "pnpm --filter @kb/web dev",
     "build": "pnpm -r build",
     "typecheck": "pnpm -r typecheck",

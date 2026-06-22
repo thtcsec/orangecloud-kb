@@ -102,7 +102,7 @@ export default function SettingsPage() {
           </div>
           <div>
             <dt className="text-muted">Custom GPT Endpoints</dt>
-            <dd className="mt-1 space-y-1 font-mono text-xs text-zinc-400">
+            <dd className="mt-1 space-y-1 font-mono text-xs text-muted">
               <p>GET /api/knowledge/search?q=...</p>
               <p>GET /api/knowledge/context</p>
               <p>GET /api/knowledge/notes</p>
@@ -112,14 +112,14 @@ export default function SettingsPage() {
           </div>
           <div>
             <dt className="text-muted">Authentication</dt>
-            <dd className="mt-1 text-zinc-400">
+            <dd className="mt-1 text-muted">
               Knowledge API endpoints require <code className="text-accent">Authorization: Bearer &lt;API_KEY&gt;</code>.
               Set <code className="text-accent">API_KEY</code> in worker secrets.
             </dd>
           </div>
           <div>
             <dt className="text-muted">Embedding Model</dt>
-            <dd className="mt-1 font-mono text-zinc-400">@cf/baai/bge-small-en-v1.5 (384 dimensions)</dd>
+            <dd className="mt-1 font-mono text-muted">@cf/baai/bge-small-en-v1.5 (384 dimensions)</dd>
           </div>
         </dl>
       </section>

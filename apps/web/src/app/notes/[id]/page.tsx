@@ -4,9 +4,10 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { api } from "@/lib/api";
-import { formatDate, parseTags } from "@/lib/utils";
+import { parseTags } from "@/lib/utils";
 import { MarkdownRenderer } from "@/components/MarkdownRenderer";
 import { CommentsSection } from "@/components/CommentsSection";
+import { ClientDate } from "@/components/ClientDate";
 import type { Comment, Note } from "@kb/shared";
 import { Pencil, Trash2 } from "lucide-react";
 
@@ -53,7 +54,7 @@ export default function NoteDetailPage() {
             <div className="mt-2 flex flex-wrap items-center gap-2 text-sm text-muted">
               <span>{note.author}</span>
               <span>·</span>
-              <span>{formatDate(note.updated_at)}</span>
+              <ClientDate iso={note.updated_at} />
               {note.folder && (
                 <>
                   <span>·</span>
@@ -62,7 +63,9 @@ export default function NoteDetailPage() {
               )}
               <span
                 className={`rounded-full px-2 py-0.5 text-xs ${
-                  note.status === "published" ? "bg-green-900/40 text-green-400" : "bg-zinc-800"
+                  note.status === "published"
+                    ? "bg-green-500/15 text-green-700 dark:text-green-400"
+                    : "bg-surface-elevated text-muted"
                 }`}
               >
                 {note.status}

@@ -3,7 +3,7 @@
 import type { Comment } from "@kb/shared";
 import { useState } from "react";
 import { api } from "@/lib/api";
-import { formatDate } from "@/lib/utils";
+import { ClientDate } from "./ClientDate";
 import { MarkdownRenderer } from "./MarkdownRenderer";
 import { ChevronDown, ChevronUp, MessageSquare } from "lucide-react";
 
@@ -77,7 +77,7 @@ export function CommentsSection({ noteId, initialComments }: { noteId: string; i
               <article key={comment.id} className="rounded-lg border border-border bg-surface-elevated p-4">
                 <div className="mb-2 flex items-center justify-between text-sm">
                   <span className="font-medium text-accent">{comment.author}</span>
-                  <span className="text-muted">{formatDate(comment.created_at)}</span>
+                  <ClientDate iso={comment.created_at} className="text-muted" />
                 </div>
                 <MarkdownRenderer content={comment.content} />
               </article>

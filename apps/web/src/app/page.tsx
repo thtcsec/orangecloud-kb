@@ -5,7 +5,6 @@ import Link from "next/link";
 import { api } from "@/lib/api";
 import { NoteCard } from "@/components/NoteCard";
 import { Search, FileText, MessageSquare, BookOpen } from "lucide-react";
-import { motion } from "framer-motion";
 
 export default function DashboardPage() {
   const [stats, setStats] = useState({ total: 0, published: 0, drafts: 0, comments: 0 });
@@ -45,20 +44,14 @@ export default function DashboardPage() {
       </header>
 
       <div className="mb-8 grid grid-cols-2 gap-4 lg:grid-cols-4">
-        {statCards.map((card, i) => (
-          <motion.div
-            key={card.label}
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.05 }}
-            className="rounded-xl border border-border bg-surface p-4"
-          >
+        {statCards.map((card) => (
+          <div key={card.label} className="rounded-xl border border-border bg-surface p-4">
             <div className="mb-2 flex items-center justify-between">
               <span className="text-sm text-muted">{card.label}</span>
               <card.icon size={18} className="text-accent" />
             </div>
             <p className="text-3xl font-bold">{loading ? "—" : card.value}</p>
-          </motion.div>
+          </div>
         ))}
       </div>
 

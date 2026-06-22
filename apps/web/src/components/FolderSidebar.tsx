@@ -17,7 +17,7 @@ export function FolderSidebar({ folders, selected, onSelect }: FolderSidebarProp
         type="button"
         onClick={() => onSelect(undefined)}
         className={`mb-1 flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-sm ${
-          !selected ? "bg-accent/10 text-accent" : "text-zinc-400 hover:text-foreground"
+          !selected ? "bg-accent/10 text-accent" : "text-muted hover:text-foreground"
         }`}
       >
         <FolderOpen size={16} />
@@ -29,7 +29,7 @@ export function FolderSidebar({ folders, selected, onSelect }: FolderSidebarProp
           type="button"
           onClick={() => onSelect(folder)}
           className={`mb-1 flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left text-sm ${
-            selected === folder ? "bg-accent/10 text-accent" : "text-zinc-400 hover:text-foreground"
+            selected === folder ? "bg-accent/10 text-accent" : "text-muted hover:text-foreground"
           }`}
         >
           <Folder size={16} />

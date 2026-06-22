@@ -11,10 +11,21 @@ import { errorResponse } from "./lib/utils";
 
 const app = new Hono<{ Bindings: Env }>();
 
+const ALLOWED_ORIGINS = [
+  "http://localhost:3000",
+  "http://127.0.0.1:3000",
+];
+
 app.use(
   "*",
   cors({
-    origin: (origin) => origin ?? "*",
+    origin: (origin, c) => {
+      if (!origin) return "*";
+      const env = (c as unknown as { env: Env }).env;
+      const extra = env.ALLOWED_ORIGINS?.split(",").map((o) => o.trim()) ?? [];
+      const all = [...ALLOWED_ORIGINS, ...extra];
+      return all.includes(origin) ? origin : "";
+    },
     allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowHeaders: ["Content-Type", "Authorization", "X-API-Key"],
     credentials: true,

@@ -1,12 +1,20 @@
 import { Hono } from "hono";
 import type { Env } from "../env";
+import { requireAuth } from "./auth";
 import { errorResponse, jsonResponse } from "../lib/utils";
+import { rateLimiter } from "../lib/rate-limit";
 import { chatWithRag } from "../services/chat";
 import { createChatStream } from "../services/chat-stream";
 
 export const chatRoutes = new Hono<{ Bindings: Env }>();
 
+// Rate limit: 10 requests/minute per IP
+chatRoutes.use("*", rateLimiter(10, 60_000));
+
 chatRoutes.post("/", async (c) => {
+  const authError = await requireAuth(c);
+  if (authError) return authError;
+
   const body = await c.req.json<{ question?: string; topK?: number; stream?: boolean }>();
   if (!body.question?.trim()) {
     return errorResponse("question is required", 400);

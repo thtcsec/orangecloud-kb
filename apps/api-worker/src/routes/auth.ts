@@ -22,9 +22,11 @@ authRoutes.post("/login", async (c) => {
 
   const token = await createSessionToken(c.env.ADMIN_PASSWORD);
   const response = jsonResponse({ ok: true });
+  const isSecure = new URL(c.req.url).protocol === "https:";
+  const secure = isSecure ? "; Secure" : "";
   response.headers.set(
     "Set-Cookie",
-    `${SESSION_COOKIE}=${token}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${60 * 60 * 24 * 7}`,
+    `${SESSION_COOKIE}=${token}; Path=/; HttpOnly; SameSite=Lax${secure}; Max-Age=${60 * 60 * 24 * 7}`,
   );
   return response;
 });

@@ -79,7 +79,6 @@ export function Sidebar() {
         <p className="text-[10px] text-muted leading-relaxed">
           Built by <span className="text-foreground font-medium">Trinh Hoang Tu</span> &amp; <span className="text-foreground font-medium">Le Sy Cuong</span>
         </p>
-        <p className="text-[10px] text-muted mt-0.5">Cloudflare Solutions Research</p>
       </div>
     </aside>
   );

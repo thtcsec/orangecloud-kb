@@ -10,4 +10,5 @@ export interface Env {
   CHUNK_SIZE: string;
   CHUNK_OVERLAP: string;
   GPT_MODEL: string;
+  ALLOWED_ORIGINS?: string;
 }

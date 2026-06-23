@@ -52,8 +52,8 @@ function AdminNotesContent() {
     if (selected.size === 0) return;
     const confirmMsg =
       action === "delete"
-        ? `Delete ${selected.size} note(s)? This cannot be undone.`
-        : `${action === "publish" ? "Publish" : "Unpublish"} ${selected.size} note(s)?`;
+        ? `Xoá ${selected.size} ghi chú? Hành động không thể hoàn tác.`
+        : `${action === "publish" ? "Xuất bản" : "Ẩn"} ${selected.size} ghi chú?`;
 
     if (!confirm(confirmMsg)) return;
 
@@ -75,7 +75,7 @@ function AdminNotesContent() {
       }
     }
 
-    setMessage(`${success} succeeded, ${failed} failed`);
+    setMessage(`${success} thành công, ${failed} thất bại`);
     setSelected(new Set());
     setActing(false);
 
@@ -84,7 +84,7 @@ function AdminNotesContent() {
   }
 
   if (loading) {
-    return <div className="p-6 text-muted">Loading notes...</div>;
+    return <div className="p-6 text-muted">Đang tải...</div>;
   }
 
   return (
@@ -92,36 +92,36 @@ function AdminNotesContent() {
       <header className="mb-6 flex items-center justify-between">
         <div>
           <Link href="/admin" className="mb-2 flex items-center gap-1 text-sm text-muted hover:text-foreground">
-            <ArrowLeft size={14} /> Back to Admin
+            <ArrowLeft size={14} /> Quay lại Admin
           </Link>
-          <h1 className="text-2xl font-bold">Manage Notes</h1>
-          <p className="text-sm text-muted">{notes.length} notes total</p>
+          <h1 className="text-2xl font-bold">Quản lý ghi chú</h1>
+          <p className="text-sm text-muted">{notes.length} ghi chú</p>
         </div>
       </header>
 
       {selected.size > 0 && (
         <div className="mb-4 flex items-center gap-3 rounded-lg border border-accent/30 bg-accent/5 p-3">
-          <span className="text-sm font-medium">{selected.size} selected</span>
+          <span className="text-sm font-medium">{selected.size} đã chọn</span>
           <button
             onClick={() => bulkAction("publish")}
             disabled={acting}
             className="flex items-center gap-1 rounded-md bg-green-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-green-700 disabled:opacity-50"
           >
-            <Eye size={14} /> Publish
+            <Eye size={14} /> Xuất bản
           </button>
           <button
             onClick={() => bulkAction("unpublish")}
             disabled={acting}
             className="flex items-center gap-1 rounded-md bg-yellow-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-yellow-700 disabled:opacity-50"
           >
-            <EyeOff size={14} /> Unpublish
+            <EyeOff size={14} /> Ẩn
           </button>
           <button
             onClick={() => bulkAction("delete")}
             disabled={acting}
             className="flex items-center gap-1 rounded-md bg-red-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-red-700 disabled:opacity-50"
           >
-            <Trash2 size={14} /> Delete
+            <Trash2 size={14} /> Xoá
           </button>
         </div>
       )}
@@ -134,7 +134,7 @@ function AdminNotesContent() {
 
       {notes.length === 0 ? (
         <div className="rounded-xl border border-border bg-surface p-12 text-center text-muted">
-          No notes yet.
+          Chưa có ghi chú nào.
         </div>
       ) : (
         <div className="overflow-hidden rounded-xl border border-border">
@@ -149,11 +149,11 @@ function AdminNotesContent() {
                     className="rounded"
                   />
                 </th>
-                <th className="px-4 py-3 text-left font-medium text-muted">Title</th>
-                <th className="px-4 py-3 text-left font-medium text-muted">Author</th>
-                <th className="px-4 py-3 text-left font-medium text-muted">Status</th>
-                <th className="px-4 py-3 text-left font-medium text-muted">Folder</th>
-                <th className="px-4 py-3 text-left font-medium text-muted">Updated</th>
+                <th className="px-4 py-3 text-left font-medium text-muted">Tiêu đề</th>
+                <th className="px-4 py-3 text-left font-medium text-muted">Tác giả</th>
+                <th className="px-4 py-3 text-left font-medium text-muted">Trạng thái</th>
+                <th className="px-4 py-3 text-left font-medium text-muted">Thư mục</th>
+                <th className="px-4 py-3 text-left font-medium text-muted">Cập nhật</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border">

@@ -24,7 +24,7 @@ export function NoteCard({ note }: { note: Note }) {
               : "bg-surface-elevated text-muted"
           }`}
         >
-          {note.status}
+          {note.status === "published" ? "Đã xuất bản" : "Bản nháp"}
         </span>
       </div>
       <p className="mb-3 line-clamp-2 text-sm text-muted">{note.content.slice(0, 160)}...</p>

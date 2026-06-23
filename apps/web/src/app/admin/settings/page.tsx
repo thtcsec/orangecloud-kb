@@ -29,30 +29,30 @@ function AdminSettingsContent() {
     <div className="mx-auto max-w-3xl p-6">
       <header className="mb-8">
         <Link href="/admin" className="mb-2 flex items-center gap-1 text-sm text-muted hover:text-foreground">
-          <ArrowLeft size={14} /> Back to Admin
+          <ArrowLeft size={14} /> Quay lại Admin
         </Link>
-        <h1 className="text-2xl font-bold">System Settings</h1>
-        <p className="text-sm text-muted">API configuration and system status</p>
+        <h1 className="text-2xl font-bold">Cài đặt hệ thống</h1>
+        <p className="text-sm text-muted">Cấu hình API và trạng thái hệ thống</p>
       </header>
 
       {/* System Status */}
       <section className="mb-6 rounded-xl border border-border bg-surface p-6">
         <h2 className="mb-4 flex items-center gap-2 font-semibold">
           <Cpu size={18} className="text-accent" />
-          System Status
+          Trạng thái hệ thống
         </h2>
         <div className="space-y-3 text-sm">
           <div className="flex items-center justify-between">
             <span className="text-muted">API Health</span>
             {healthOk === null ? (
-              <span className="text-muted">Checking...</span>
+              <span className="text-muted">Đang kiểm tra...</span>
             ) : healthOk ? (
               <span className="flex items-center gap-1 text-green-500">
-                <CheckCircle size={14} /> Healthy
+                <CheckCircle size={14} /> Hoạt động
               </span>
             ) : (
               <span className="flex items-center gap-1 text-red-400">
-                <XCircle size={14} /> Unreachable
+                <XCircle size={14} /> Không thể kết nối
               </span>
             )}
           </div>
@@ -67,7 +67,7 @@ function AdminSettingsContent() {
       <section className="mb-6 rounded-xl border border-border bg-surface p-6">
         <h2 className="mb-4 flex items-center gap-2 font-semibold">
           <Key size={18} className="text-accent" />
-          API Integration
+          Tích hợp API
         </h2>
         <dl className="space-y-4 text-sm">
           <div>
@@ -103,7 +103,7 @@ function AdminSettingsContent() {
       <section className="mb-6 rounded-xl border border-border bg-surface p-6">
         <h2 className="mb-4 flex items-center gap-2 font-semibold">
           <Globe size={18} className="text-accent" />
-          Security
+          Bảo mật
         </h2>
         <dl className="space-y-4 text-sm">
           <div>
@@ -114,13 +114,13 @@ function AdminSettingsContent() {
             </dd>
           </div>
           <div>
-            <dt className="text-muted">Rate Limiting</dt>
-            <dd className="mt-1 text-muted">10 requests/minute per IP on /api/chat</dd>
+            <dt className="text-muted">Giới hạn tốc độ</dt>
+            <dd className="mt-1 text-muted">10 request/phút/IP trên /api/chat, 30 request/phút/IP cho ghi (POST/PUT/DELETE)</dd>
           </div>
           <div>
-            <dt className="text-muted">Authentication</dt>
+            <dt className="text-muted">Xác thực</dt>
             <dd className="mt-1 text-muted">
-              HMAC-SHA256 session tokens, HttpOnly cookie, 7-day expiry, Secure flag on HTTPS
+              HMAC-SHA256 session tokens, HttpOnly cookie, hết hạn sau 7 ngày, Secure flag trên HTTPS
             </dd>
           </div>
         </dl>
@@ -128,13 +128,13 @@ function AdminSettingsContent() {
 
       {/* Session */}
       <section className="rounded-xl border border-border bg-surface p-6">
-        <h2 className="mb-4 font-semibold">Session</h2>
+        <h2 className="mb-4 font-semibold">Phiên đăng nhập</h2>
         <button
           onClick={logout}
           className="flex items-center gap-2 rounded-lg border border-border px-4 py-2 text-sm transition hover:border-red-400 hover:text-red-400"
         >
           <LogOut size={16} />
-          Logout
+          Đăng xuất
         </button>
       </section>
     </div>

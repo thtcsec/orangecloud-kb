@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { api, API_URL } from "@/lib/api";
-import { Key, LogIn, LogOut } from "lucide-react";
+import { Key, LogIn, LogOut, Palette } from "lucide-react";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 export default function SettingsPage() {
   const [authenticated, setAuthenticated] = useState(false);
@@ -23,7 +24,7 @@ export default function SettingsPage() {
       setAuthenticated(true);
       setPassword("");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Login failed");
+      setError(err instanceof Error ? err.message : "Đăng nhập thất bại");
     } finally {
       setLoading(false);
     }
@@ -37,26 +38,36 @@ export default function SettingsPage() {
   return (
     <div className="mx-auto max-w-2xl p-6">
       <header className="mb-8">
-        <h1 className="text-2xl font-bold">Settings</h1>
-        <p className="text-sm text-muted">Authentication and API configuration</p>
+        <h1 className="text-2xl font-bold">Cài đặt</h1>
+        <p className="text-sm text-muted">Giao diện, xác thực và cấu hình API</p>
       </header>
 
+      {/* Theme */}
+      <section className="mb-8 rounded-xl border border-border bg-surface p-6">
+        <h2 className="mb-4 flex items-center gap-2 font-semibold">
+          <Palette size={18} className="text-accent" />
+          Giao diện
+        </h2>
+        <ThemeToggle />
+      </section>
+
+      {/* Auth */}
       <section className="mb-8 rounded-xl border border-border bg-surface p-6">
         <h2 className="mb-4 flex items-center gap-2 font-semibold">
           <LogIn size={18} className="text-accent" />
-          Admin Authentication
+          Xác thực Admin
         </h2>
 
         {authenticated ? (
           <div>
-            <p className="mb-4 text-sm text-green-400">You are logged in as admin.</p>
+            <p className="mb-4 text-sm text-green-600 dark:text-green-400">Đã đăng nhập với quyền admin.</p>
             <button
               type="button"
               onClick={handleLogout}
               className="flex items-center gap-2 rounded-lg border border-border px-4 py-2 text-sm hover:border-accent/40"
             >
               <LogOut size={16} />
-              Logout
+              Đăng xuất
             </button>
           </div>
         ) : (
@@ -65,8 +76,8 @@ export default function SettingsPage() {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="Admin password"
-              className="w-full"
+              placeholder="Mật khẩu admin"
+              className="w-full rounded-lg border border-border bg-background px-4 py-2.5 text-sm focus:border-accent focus:outline-none"
             />
             {error && <p className="text-sm text-red-400">{error}</p>}
             <button
@@ -74,17 +85,18 @@ export default function SettingsPage() {
               disabled={loading}
               className="rounded-lg bg-accent px-4 py-2 text-sm font-medium text-black hover:bg-accent-hover"
             >
-              {loading ? "Logging in..." : "Login"}
+              {loading ? "Đang xử lý..." : "Đăng nhập"}
             </button>
-            <p className="text-xs text-muted">Required for creating, editing, and deleting notes.</p>
+            <p className="text-xs text-muted">Cần thiết để tạo, chỉnh sửa và xoá ghi chú.</p>
           </form>
         )}
       </section>
 
+      {/* API Info */}
       <section className="rounded-xl border border-border bg-surface p-6">
         <h2 className="mb-4 flex items-center gap-2 font-semibold">
           <Key size={18} className="text-accent" />
-          API Integration
+          Tích hợp API
         </h2>
 
         <dl className="space-y-4 text-sm">
@@ -111,10 +123,10 @@ export default function SettingsPage() {
             </dd>
           </div>
           <div>
-            <dt className="text-muted">Authentication</dt>
+            <dt className="text-muted">Xác thực</dt>
             <dd className="mt-1 text-muted">
-              Knowledge API endpoints require <code className="text-accent">Authorization: Bearer &lt;API_KEY&gt;</code>.
-              Set <code className="text-accent">API_KEY</code> in worker secrets.
+              Knowledge API yêu cầu <code className="text-accent">Authorization: Bearer &lt;API_KEY&gt;</code>.
+              Cấu hình <code className="text-accent">API_KEY</code> trong Worker secrets.
             </dd>
           </div>
           <div>

@@ -68,7 +68,7 @@ export default function ChatPage() {
         onError: (msg) => setError(msg),
       });
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Chat failed");
+      setError(err instanceof Error ? err.message : "Hỏi đáp thất bại");
       setMessages((prev) => prev.filter((_, i) => i !== assistantIndex));
     } finally {
       setLoading(false);
@@ -78,7 +78,7 @@ export default function ChatPage() {
   return (
     <div className="flex h-screen flex-col p-6">
       <header className="mb-4">
-        <h1 className="text-2xl font-bold">RAG Chat</h1>
+        <h1 className="text-2xl font-bold">Hỏi đáp AI</h1>
         <p className="text-sm text-muted">
           Hybrid search (FTS + Vector) · Streaming responses
         </p>
@@ -88,7 +88,7 @@ export default function ChatPage() {
         {messages.length === 0 && (
           <div className="flex h-full flex-col items-center justify-center text-muted">
             <Bot size={48} className="mb-4 text-accent/50" />
-            <p>Ask anything about your internal notes and documentation.</p>
+            <p>Hỏi bất cứ điều gì về ghi chú và tài liệu nội bộ.</p>
           </div>
         )}
 
@@ -111,13 +111,13 @@ export default function ChatPage() {
               )}
               {msg.sources && msg.sources.length > 0 && !msg.streaming && (
                 <div className="mt-3 border-t border-border pt-2">
-                  <p className="mb-1 text-xs text-muted">Sources:</p>
+                  <p className="mb-1 text-xs text-muted">Nguồn tham khảo:</p>
                   {msg.sources.map((s, j) => (
                     <p key={j} className="text-xs">
                       <Link href={`/notes/${s.note_id}`} className="text-accent hover:underline">
                         {s.title}
                       </Link>{" "}
-                      <span className="text-muted">(score: {s.score.toFixed(3)})</span>
+                      <span className="text-muted">(điểm: {s.score.toFixed(3)})</span>
                     </p>
                   ))}
                 </div>
@@ -130,7 +130,7 @@ export default function ChatPage() {
         {loading && (
           <div className="flex items-center gap-2 text-sm text-muted">
             <Bot size={16} className="text-accent" />
-            Retrieving context...
+            Đang tìm kiếm ngữ cảnh...
           </div>
         )}
       </div>
@@ -141,7 +141,7 @@ export default function ChatPage() {
         <input
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          placeholder="Ask a question..."
+          placeholder="Đặt câu hỏi..."
           className="flex-1"
           disabled={loading}
         />
@@ -151,7 +151,7 @@ export default function ChatPage() {
           className="flex items-center gap-2 rounded-lg bg-accent px-4 py-2 font-medium text-black hover:bg-accent-hover"
         >
           <Send size={16} />
-          Send
+          Gửi
         </button>
       </form>
     </div>

@@ -13,7 +13,7 @@ export function AdminGuard({ children }: { children: React.ReactNode }) {
   if (loading) {
     return (
       <div className="flex h-full items-center justify-center p-12">
-        <div className="animate-pulse text-muted">Checking authentication...</div>
+        <div className="animate-pulse text-muted">Đang kiểm tra xác thực...</div>
       </div>
     );
   }
@@ -26,9 +26,9 @@ export function AdminGuard({ children }: { children: React.ReactNode }) {
             <div className="flex h-12 w-12 items-center justify-center rounded-full bg-accent/10">
               <Lock size={24} className="text-accent" />
             </div>
-            <h2 className="text-lg font-semibold">Admin Access Required</h2>
+            <h2 className="text-lg font-semibold">Yêu cầu quyền Admin</h2>
             <p className="text-center text-sm text-muted">
-              Enter the admin password to access this area.
+              Nhập mật khẩu admin để truy cập khu vực này.
             </p>
           </div>
 
@@ -40,7 +40,7 @@ export function AdminGuard({ children }: { children: React.ReactNode }) {
               try {
                 await login(password);
               } catch (err) {
-                setError(err instanceof Error ? err.message : "Login failed");
+                setError(err instanceof Error ? err.message : "Đăng nhập thất bại");
               } finally {
                 setSubmitting(false);
               }
@@ -51,7 +51,7 @@ export function AdminGuard({ children }: { children: React.ReactNode }) {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="Admin password"
+              placeholder="Mật khẩu admin"
               className="w-full rounded-lg border border-border bg-background px-4 py-2.5 text-sm focus:border-accent focus:outline-none"
               autoFocus
             />
@@ -62,7 +62,7 @@ export function AdminGuard({ children }: { children: React.ReactNode }) {
               className="flex w-full items-center justify-center gap-2 rounded-lg bg-accent px-4 py-2.5 text-sm font-medium text-black transition hover:bg-accent-hover disabled:opacity-50"
             >
               <LogIn size={16} />
-              {submitting ? "Logging in..." : "Login"}
+              {submitting ? "Đang xử lý..." : "Đăng nhập"}
             </button>
           </form>
         </div>

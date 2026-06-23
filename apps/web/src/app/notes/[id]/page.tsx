@@ -25,23 +25,23 @@ export default function NoteDetailPage() {
         setNote(n);
         setComments(c);
       })
-      .catch((err) => setError(err instanceof Error ? err.message : "Failed to load note"));
+      .catch((err) => setError(err instanceof Error ? err.message : "Không thể tải ghi chú"));
   }, [id]);
 
   async function handleDelete() {
-    if (!confirm("Delete this note? This cannot be undone.")) return;
+    if (!confirm("Xoá ghi chú này? Hành động không thể hoàn tác.")) return;
     setDeleting(true);
     try {
       await api.notes.delete(id);
       window.location.href = "/notes";
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to delete");
+      setError(err instanceof Error ? err.message : "Xoá thất bại");
       setDeleting(false);
     }
   }
 
   if (error) return <div className="p-6 text-red-400">{error}</div>;
-  if (!note) return <div className="p-6 text-muted">Loading...</div>;
+  if (!note) return <div className="p-6 text-muted">Đang tải...</div>;
 
   const tags = parseTags(note.tags);
 
@@ -68,7 +68,7 @@ export default function NoteDetailPage() {
                     : "bg-surface-elevated text-muted"
                 }`}
               >
-                {note.status}
+                {note.status === "published" ? "Đã xuất bản" : "Bản nháp"}
               </span>
             </div>
           </div>
@@ -78,7 +78,7 @@ export default function NoteDetailPage() {
               className="flex items-center gap-1 rounded-lg border border-border px-3 py-1.5 text-sm hover:border-accent/40"
             >
               <Pencil size={14} />
-              Edit
+              Sửa
             </Link>
             <button
               type="button"
@@ -87,7 +87,7 @@ export default function NoteDetailPage() {
               className="flex items-center gap-1 rounded-lg border border-red-900/50 px-3 py-1.5 text-sm text-red-400 hover:bg-red-900/20"
             >
               <Trash2 size={14} />
-              Delete
+              Xoá
             </button>
           </div>
         </div>

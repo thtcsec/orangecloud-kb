@@ -3,17 +3,15 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { BookOpen, Home, MessageSquare, Plus, Settings, Shield } from "lucide-react";
-import { ThemeToggle } from "./ThemeToggle";
+import { BookOpen, Home, MessageSquare, Plus, Settings } from "lucide-react";
 import { useResolvedTheme } from "./ThemeProvider";
 
 const links = [
-  { href: "/", label: "Dashboard", icon: Home, exact: true },
-  { href: "/notes", label: "Notes", icon: BookOpen, matchNotes: true },
-  { href: "/notes/new", label: "New Note", icon: Plus },
-  { href: "/chat", label: "Chat", icon: MessageSquare },
-  { href: "/admin", label: "Admin", icon: Shield },
-  { href: "/settings", label: "Settings", icon: Settings },
+  { href: "/", label: "Trang chủ", icon: Home, exact: true },
+  { href: "/notes", label: "Ghi chú", icon: BookOpen, matchNotes: true },
+  { href: "/notes/new", label: "Tạo mới", icon: Plus },
+  { href: "/chat", label: "Hỏi đáp AI", icon: MessageSquare },
+  { href: "/settings", label: "Cài đặt", icon: Settings },
 ];
 
 function isActive(pathname: string, href: string, exact?: boolean, matchNotes?: boolean): boolean {
@@ -73,8 +71,6 @@ export function Sidebar() {
           );
         })}
       </nav>
-
-      <ThemeToggle />
 
       <div className="mt-3 border-t border-border pt-3 px-2">
         <p className="text-[10px] text-muted leading-relaxed">

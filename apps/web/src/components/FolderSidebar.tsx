@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { Folder, FolderOpen } from "lucide-react";
 
 interface FolderSidebarProps {
@@ -12,7 +11,7 @@ interface FolderSidebarProps {
 export function FolderSidebar({ folders, selected, onSelect }: FolderSidebarProps) {
   return (
     <aside className="w-56 shrink-0 border-r border-border p-4">
-      <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted">Folders</h3>
+      <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted">Thư mục</h3>
       <button
         type="button"
         onClick={() => onSelect(undefined)}
@@ -21,7 +20,7 @@ export function FolderSidebar({ folders, selected, onSelect }: FolderSidebarProp
         }`}
       >
         <FolderOpen size={16} />
-        All notes
+        Tất cả
       </button>
       {folders.map((folder) => (
         <button
@@ -36,7 +35,7 @@ export function FolderSidebar({ folders, selected, onSelect }: FolderSidebarProp
           <span className="truncate">{folder}</span>
         </button>
       ))}
-      {folders.length === 0 && <p className="text-xs text-muted">No folders yet</p>}
+      {folders.length === 0 && <p className="text-xs text-muted">Chưa có thư mục</p>}
     </aside>
   );
 }
@@ -59,7 +58,7 @@ export function TagFilter({
         onClick={() => onSelect(undefined)}
         className={`rounded-full px-3 py-1 text-xs ${!selected ? "bg-accent text-black" : "bg-surface-elevated text-muted"}`}
       >
-        All tags
+        Tất cả tags
       </button>
       {tags.map((tag) => (
         <button

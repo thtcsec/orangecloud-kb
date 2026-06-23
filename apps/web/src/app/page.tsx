@@ -30,17 +30,17 @@ export default function DashboardPage() {
   }
 
   const statCards = [
-    { label: "Total Notes", value: stats.total, icon: BookOpen },
-    { label: "Published", value: stats.published, icon: FileText },
-    { label: "Drafts", value: stats.drafts, icon: FileText },
-    { label: "Comments", value: stats.comments, icon: MessageSquare },
+    { label: "Tổng ghi chú", value: stats.total, icon: BookOpen },
+    { label: "Đã xuất bản", value: stats.published, icon: FileText },
+    { label: "Bản nháp", value: stats.drafts, icon: FileText },
+    { label: "Bình luận", value: stats.comments, icon: MessageSquare },
   ];
 
   return (
     <div className="p-8">
       <header className="mb-8">
-        <h1 className="text-3xl font-bold">Dashboard</h1>
-        <p className="mt-1 text-muted">Internal knowledge base overview</p>
+        <h1 className="text-3xl font-bold">Trang chủ</h1>
+        <p className="mt-1 text-muted">Tổng quan hệ thống tri thức nội bộ</p>
       </header>
 
       <div className="mb-8 grid grid-cols-2 gap-4 lg:grid-cols-4">
@@ -61,18 +61,18 @@ export default function DashboardPage() {
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Quick search notes..."
+            placeholder="Tìm kiếm nhanh..."
             className="w-full pl-10"
           />
         </div>
         <button type="submit" className="rounded-lg bg-accent px-4 py-2 font-medium text-black hover:bg-accent-hover">
-          Search
+          Tìm
         </button>
       </form>
 
       {searchResults.length > 0 ? (
         <section>
-          <h2 className="mb-4 text-lg font-semibold">Search Results</h2>
+          <h2 className="mb-4 text-lg font-semibold">Kết quả tìm kiếm</h2>
           <div className="grid gap-4 md:grid-cols-2">
             {searchResults.map((note) => (
               <NoteCard key={note.id} note={note} />
@@ -82,9 +82,9 @@ export default function DashboardPage() {
       ) : (
         <section>
           <div className="mb-4 flex items-center justify-between">
-            <h2 className="text-lg font-semibold">Recent Notes</h2>
+            <h2 className="text-lg font-semibold">Ghi chú gần đây</h2>
             <Link href="/notes" className="text-sm text-accent hover:text-accent-hover">
-              View all →
+              Xem tất cả →
             </Link>
           </div>
           <div className="grid gap-4 md:grid-cols-2">
@@ -93,9 +93,9 @@ export default function DashboardPage() {
             ))}
             {!loading && recentNotes.length === 0 && (
               <p className="text-muted">
-                No notes yet.{" "}
+                Chưa có ghi chú nào.{" "}
                 <Link href="/notes/new" className="text-accent">
-                  Create your first note
+                  Tạo ghi chú đầu tiên
                 </Link>
               </p>
             )}

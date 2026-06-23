@@ -32,27 +32,27 @@ function AdminDashboardContent() {
     <div className="p-6">
       <header className="mb-8">
         <h1 className="text-2xl font-bold">Admin Dashboard</h1>
-        <p className="text-sm text-muted">System overview and management</p>
+        <p className="text-sm text-muted">Tổng quan hệ thống và quản lý</p>
       </header>
 
       <div className="mb-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <StatCard icon={FileText} label="Total Notes" value={stats?.total ?? 0} />
-        <StatCard icon={Upload} label="Published" value={stats?.published ?? 0} color="green" />
-        <StatCard icon={FileText} label="Drafts" value={stats?.drafts ?? 0} color="yellow" />
-        <StatCard icon={MessageSquare} label="Comments" value={stats?.comments ?? 0} color="blue" />
+        <StatCard icon={FileText} label="Tổng ghi chú" value={stats?.total ?? 0} />
+        <StatCard icon={Upload} label="Đã xuất bản" value={stats?.published ?? 0} color="green" />
+        <StatCard icon={FileText} label="Bản nháp" value={stats?.drafts ?? 0} color="yellow" />
+        <StatCard icon={MessageSquare} label="Bình luận" value={stats?.comments ?? 0} color="blue" />
       </div>
 
       <div className="grid gap-6 lg:grid-cols-2">
         <QuickAction
           href="/admin/notes"
-          title="Manage Notes"
-          description="Bulk publish, unpublish, or delete notes"
+          title="Quản lý ghi chú"
+          description="Xuất bản, ẩn hoặc xoá hàng loạt"
           icon={FileText}
         />
         <QuickAction
           href="/admin/settings"
-          title="System Settings"
-          description="API config, secrets status, allowed origins"
+          title="Cài đặt hệ thống"
+          description="Cấu hình API, trạng thái secrets, bảo mật"
           icon={Shield}
         />
       </div>

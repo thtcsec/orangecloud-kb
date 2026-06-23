@@ -39,7 +39,7 @@ export default function NotesPage() {
 
       <div className="flex-1 p-6">
         <header className="mb-6">
-          <h1 className="text-2xl font-bold">All Notes</h1>
+          <h1 className="text-2xl font-bold">Tất cả ghi chú</h1>
         </header>
 
         <div className="relative mb-4 max-w-md">
@@ -47,7 +47,7 @@ export default function NotesPage() {
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search notes..."
+            placeholder="Tìm kiếm ghi chú..."
             className="w-full pl-10"
           />
         </div>
@@ -55,13 +55,13 @@ export default function NotesPage() {
         <TagFilter tags={tags} selected={selectedTag} onSelect={setSelectedTag} />
 
         {loading ? (
-          <p className="text-muted">Loading...</p>
+          <p className="text-muted">Đang tải...</p>
         ) : (
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
             {notes.map((note) => (
               <NoteCard key={note.id} note={note} />
             ))}
-            {notes.length === 0 && <p className="text-muted">No notes found.</p>}
+            {notes.length === 0 && <p className="text-muted">Không tìm thấy ghi chú nào.</p>}
           </div>
         )}
       </div>

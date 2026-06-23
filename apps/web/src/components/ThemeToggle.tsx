@@ -15,15 +15,14 @@ export function ThemeToggle() {
 
   if (!mounted) {
     return (
-      <div className="mt-auto rounded-lg border border-border bg-surface-elevated p-1">
+      <div className="rounded-lg border border-border bg-surface-elevated p-1">
         <div className="h-9" aria-hidden />
       </div>
     );
   }
 
   return (
-    <div className="mt-auto rounded-lg border border-border bg-surface-elevated p-1">
-      <p className="mb-2 px-2 pt-1 text-xs font-medium text-muted">Giao diện</p>
+    <div className="rounded-lg border border-border bg-surface-elevated p-1">
       <div className="grid grid-cols-3 gap-1">
         {options.map(({ value, label, icon: Icon }) => (
           <button

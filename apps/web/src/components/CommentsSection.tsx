@@ -26,7 +26,7 @@ export function CommentsSection({ noteId, initialComments }: { noteId: string; i
       setComments((prev) => [...prev, comment]);
       setContent("");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to post comment");
+      setError(err instanceof Error ? err.message : "Không thể đăng bình luận");
     } finally {
       setLoading(false);
     }
@@ -41,7 +41,7 @@ export function CommentsSection({ noteId, initialComments }: { noteId: string; i
       >
         <span className="flex items-center gap-2 font-medium">
           <MessageSquare size={18} className="text-accent" />
-          Comments ({comments.length})
+          Bình luận ({comments.length})
         </span>
         {expanded ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
       </button>
@@ -52,13 +52,13 @@ export function CommentsSection({ noteId, initialComments }: { noteId: string; i
             <input
               value={author}
               onChange={(e) => setAuthor(e.target.value)}
-              placeholder="Your name"
+              placeholder="Tên của bạn"
               className="w-full"
             />
             <textarea
               value={content}
               onChange={(e) => setContent(e.target.value)}
-              placeholder="Write a comment (markdown supported)"
+              placeholder="Viết bình luận (hỗ trợ markdown)"
               rows={3}
               className="w-full resize-y"
             />
@@ -68,7 +68,7 @@ export function CommentsSection({ noteId, initialComments }: { noteId: string; i
               disabled={loading}
               className="rounded-lg bg-accent px-4 py-2 text-sm font-medium text-black hover:bg-accent-hover"
             >
-              {loading ? "Posting..." : "Post Comment"}
+              {loading ? "Đang gửi..." : "Đăng bình luận"}
             </button>
           </form>
 
@@ -82,7 +82,7 @@ export function CommentsSection({ noteId, initialComments }: { noteId: string; i
                 <MarkdownRenderer content={comment.content} />
               </article>
             ))}
-            {comments.length === 0 && <p className="text-sm text-muted">No comments yet.</p>}
+            {comments.length === 0 && <p className="text-sm text-muted">Chưa có bình luận nào.</p>}
           </div>
         </div>
       )}

@@ -1,43 +1,45 @@
 {
-  "$schema": "../../node_modules/wrangler/config-schema.json",
-  "name": "knowledge-base-api",
-  "main": "src/index.ts",
-  "compatibility_date": "2025-06-01",
-  "compatibility_flags": ["nodejs_compat"],
-  // Đổi account_id nếu cần dùng account khác:
-  // Cloudspace: 4c15704ef706b9c8954cd6f9feb678d8
-  // Tht.csec2005@gmail.com: d26517432bff17b8889b98cc366c70f1
-  "account_id": "4c15704ef706b9c8954cd6f9feb678d8",
-  "vars": {
-    "EMBEDDING_MODEL": "@cf/baai/bge-small-en-v1.5",
-    "CHUNK_SIZE": "500",
-    "CHUNK_OVERLAP": "50",
-    "GPT_MODEL": "gpt-4o-mini",
-    "ALLOWED_ORIGINS": "https://kb.orangecloud.vn"
-  },
-  "d1_databases": [
-    {
-      "binding": "DB",
-      "database_name": "knowledge-base",
-      "database_id": "REPLACE_WITH_YOUR_D1_DATABASE_ID",
-      "migrations_dir": "migrations"
-    }
-  ],
-  "r2_buckets": [
-    {
-      "binding": "ATTACHMENTS",
-      "bucket_name": "knowledge-base-attachments"
-    }
-  ],
-  "vectorize": [
-    {
-      "binding": "VECTORIZE",
-      "index_name": "knowledge-base-embeddings",
-      "remote": true
-    }
-  ],
-  "ai": {
-    "binding": "AI",
-    "remote": true
-  }
+	"$schema": "../../node_modules/wrangler/config-schema.json",
+	"name": "knowledge-base-api",
+	"main": "src/index.ts",
+	"compatibility_date": "2025-06-01",
+	"compatibility_flags": [
+		"nodejs_compat"
+	],
+	// Đổi account_id nếu cần dùng account khác:
+	// Cloudspace: 4c15704ef706b9c8954cd6f9feb678d8
+	// Tht.csec2005@gmail.com: d26517432bff17b8889b98cc366c70f1
+	"account_id": "4c15704ef706b9c8954cd6f9feb678d8",
+	"vars": {
+		"EMBEDDING_MODEL": "@cf/baai/bge-small-en-v1.5",
+		"CHUNK_SIZE": "500",
+		"CHUNK_OVERLAP": "50",
+		"GPT_MODEL": "gpt-4o-mini",
+		"ALLOWED_ORIGINS": "https://kb.orangecloud.vn"
+	},
+	"d1_databases": [
+		{
+			"binding": "DB",
+			"database_name": "knowledge-base",
+			"database_id": "d53434e3-5c74-4e48-8c3b-bced995135a3",
+			"migrations_dir": "migrations"
+		}
+	],
+	"r2_buckets": [
+		{
+			"binding": "ATTACHMENTS",
+			"bucket_name": "knowledge-base-attachments"
+		}
+	],
+	"vectorize": [
+		{
+			"binding": "VECTORIZE",
+			"index_name": "knowledge-base-embeddings",
+			"remote": true
+		}
+	],
+	"ai": {
+		"binding": "AI",
+		"remote": true
+	}
 }

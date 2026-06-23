@@ -1,0 +1,1 @@
+This folder contains the built output assets for the worker "knowledge-base-api" generated at 2026-06-23T11:00:46.598Z.

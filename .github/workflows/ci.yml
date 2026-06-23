@@ -86,8 +86,8 @@ jobs:
           NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL }}
         run: |
           cd apps/web
-          pnpm build
-          npx wrangler pages deploy .next --project-name=knowledge-base-web
+          npx @cloudflare/next-on-pages
+          npx wrangler pages deploy .vercel/output/static --project-name=orangecloud-kb
 
       - name: Skip deploy (secrets not configured)
         if: env.CF_API_TOKEN == ''

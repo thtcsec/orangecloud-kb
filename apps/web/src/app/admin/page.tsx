@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { api } from "@/lib/api";
-import { AdminGuard } from "@/components/AdminGuard";
 import { FileText, MessageSquare, Upload, Shield } from "lucide-react";
 
 interface Stats {
@@ -14,14 +13,6 @@ interface Stats {
 }
 
 export default function AdminDashboard() {
-  return (
-    <AdminGuard>
-      <AdminDashboardContent />
-    </AdminGuard>
-  );
-}
-
-function AdminDashboardContent() {
   const [stats, setStats] = useState<Stats | null>(null);
 
   useEffect(() => {

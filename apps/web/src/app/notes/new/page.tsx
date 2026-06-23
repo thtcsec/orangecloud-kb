@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { api } from "@/lib/api";
 import { MarkdownEditor } from "@/components/MarkdownEditor";
+import { FolderSelect } from "@/components/FolderSelect";
 
 export default function NewNotePage() {
   const router = useRouter();
@@ -41,7 +42,7 @@ export default function NewNotePage() {
         <div className="grid gap-4 md:grid-cols-2">
           <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Tiêu đề" required className="w-full" />
           <input value={author} onChange={(e) => setAuthor(e.target.value)} placeholder="Tác giả" required className="w-full" />
-          <input value={folder} onChange={(e) => setFolder(e.target.value)} placeholder="Thư mục (VD: research/rag)" className="w-full" />
+          <FolderSelect value={folder} onChange={setFolder} />
           <input value={tags} onChange={(e) => setTags(e.target.value)} placeholder="Tags (phân cách bởi dấu phẩy)" className="w-full" />
           <select value={status} onChange={(e) => setStatus(e.target.value as "draft" | "published")} className="w-full">
             <option value="draft">Bản nháp</option>

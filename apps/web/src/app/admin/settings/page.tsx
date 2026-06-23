@@ -2,21 +2,10 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { api, API_URL } from "@/lib/api";
-import { AdminGuard } from "@/components/AdminGuard";
-import { useAuth } from "@/hooks/useAuth";
-import { ArrowLeft, Key, Globe, Cpu, LogOut, CheckCircle, XCircle } from "lucide-react";
+import { API_URL } from "@/lib/api";
+import { ArrowLeft, Key, Globe, Cpu, CheckCircle, XCircle, Shield } from "lucide-react";
 
 export default function AdminSettingsPage() {
-  return (
-    <AdminGuard>
-      <AdminSettingsContent />
-    </AdminGuard>
-  );
-}
-
-function AdminSettingsContent() {
-  const { logout } = useAuth();
   const [healthOk, setHealthOk] = useState<boolean | null>(null);
 
   useEffect(() => {
@@ -32,7 +21,7 @@ function AdminSettingsContent() {
           <ArrowLeft size={14} /> Quay lại Admin
         </Link>
         <h1 className="text-2xl font-bold">Cài đặt hệ thống</h1>
-        <p className="text-sm text-muted">Cấu hình API và trạng thái hệ thống</p>
+        <p className="text-sm text-muted">Cấu hình API, bảo mật và trạng thái hệ thống</p>
       </header>
 
       {/* System Status */}
@@ -84,12 +73,18 @@ function AdminSettingsContent() {
             </dd>
           </div>
           <div>
-            <dt className="text-muted">Knowledge API (bearer token required)</dt>
+            <dt className="text-muted">Knowledge API (bearer token)</dt>
             <dd className="mt-1 space-y-1 font-mono text-xs text-muted">
               <p>GET /api/knowledge/search?q=...</p>
               <p>GET /api/knowledge/context</p>
               <p>GET /api/knowledge/notes</p>
               <p>GET /api/knowledge/notes/:id</p>
+            </dd>
+          </div>
+          <div>
+            <dt className="text-muted">Xác thực API</dt>
+            <dd className="mt-1 text-muted">
+              <code className="text-accent">Authorization: Bearer &lt;API_KEY&gt;</code> — cấu hình trong Worker secrets.
             </dd>
           </div>
           <div>
@@ -99,13 +94,17 @@ function AdminSettingsContent() {
         </dl>
       </section>
 
-      {/* Allowed Origins */}
-      <section className="mb-6 rounded-xl border border-border bg-surface p-6">
+      {/* Security */}
+      <section className="rounded-xl border border-border bg-surface p-6">
         <h2 className="mb-4 flex items-center gap-2 font-semibold">
-          <Globe size={18} className="text-accent" />
+          <Shield size={18} className="text-accent" />
           Bảo mật
         </h2>
         <dl className="space-y-4 text-sm">
+          <div>
+            <dt className="text-muted">Truy cập Admin</dt>
+            <dd className="mt-1 text-muted">Bảo vệ bởi Cloudflare Access — chỉ người được phép mới truy cập được /admin</dd>
+          </div>
           <div>
             <dt className="text-muted">CORS Allowed Origins</dt>
             <dd className="mt-1 font-mono text-xs text-muted">
@@ -115,27 +114,17 @@ function AdminSettingsContent() {
           </div>
           <div>
             <dt className="text-muted">Giới hạn tốc độ</dt>
-            <dd className="mt-1 text-muted">10 request/phút/IP trên /api/chat, 30 request/phút/IP cho ghi (POST/PUT/DELETE)</dd>
+            <dd className="mt-1 text-muted">
+              10 request/phút/IP trên /api/chat · 30 request/phút/IP cho ghi (POST/PUT/DELETE)
+            </dd>
           </div>
           <div>
-            <dt className="text-muted">Xác thực</dt>
+            <dt className="text-muted">Security Headers</dt>
             <dd className="mt-1 text-muted">
-              HMAC-SHA256 session tokens, HttpOnly cookie, hết hạn sau 7 ngày, Secure flag trên HTTPS
+              X-Frame-Options: DENY · X-Content-Type-Options: nosniff · Referrer-Policy: strict-origin
             </dd>
           </div>
         </dl>
-      </section>
-
-      {/* Session */}
-      <section className="rounded-xl border border-border bg-surface p-6">
-        <h2 className="mb-4 font-semibold">Phiên đăng nhập</h2>
-        <button
-          onClick={logout}
-          className="flex items-center gap-2 rounded-lg border border-border px-4 py-2 text-sm transition hover:border-red-400 hover:text-red-400"
-        >
-          <LogOut size={16} />
-          Đăng xuất
-        </button>
       </section>
     </div>
   );

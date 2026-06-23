@@ -3,17 +3,12 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { api } from "@/lib/api";
-import { AdminGuard } from "@/components/AdminGuard";
 import { ClientDate } from "@/components/ClientDate";
 import type { Note } from "@kb/shared";
 import { Check, Trash2, Eye, EyeOff, ArrowLeft } from "lucide-react";
 
 export default function AdminNotesPage() {
-  return (
-    <AdminGuard>
-      <AdminNotesContent />
-    </AdminGuard>
-  );
+  return <AdminNotesContent />;
 }
 
 function AdminNotesContent() {

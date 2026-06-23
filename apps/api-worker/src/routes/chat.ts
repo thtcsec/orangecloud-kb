@@ -1,6 +1,5 @@
 import { Hono } from "hono";
 import type { Env } from "../env";
-import { requireAuth } from "./auth";
 import { errorResponse, jsonResponse } from "../lib/utils";
 import { rateLimiter } from "../lib/rate-limit";
 import { chatWithRag } from "../services/chat";
@@ -8,24 +7,23 @@ import { createChatStream } from "../services/chat-stream";
 
 export const chatRoutes = new Hono<{ Bindings: Env }>();
 
-// Rate limit: 10 requests/minute per IP
+// Rate limit: 10 requests/minute per IP (anti-spam)
 chatRoutes.use("*", rateLimiter(10, 60_000));
 
 chatRoutes.post("/", async (c) => {
-  const authError = await requireAuth(c);
-  if (authError) return authError;
-
   const body = await c.req.json<{ question?: string; topK?: number; stream?: boolean }>();
   if (!body.question?.trim()) {
     return errorResponse("question is required", 400);
   }
 
+  // Limit question length to prevent abuse
+  const question = body.question.trim().slice(0, 2000);
+
   if (!c.env.OPENAI_API_KEY) {
     return errorResponse("OpenAI API key not configured", 503);
   }
 
-  const question = body.question.trim();
-  const topK = body.topK ?? 5;
+  const topK = Math.min(body.topK ?? 5, 10);
 
   if (body.stream) {
     return new Response(createChatStream(c.env, question, topK), {

@@ -13,6 +13,7 @@
   "dependencies": {
     "@kb/shared": "workspace:*",
     "@uiw/react-md-editor": "^4.0.5",
+    "framer-motion": "^12.41.0",
     "lucide-react": "^0.475.0",
     "mermaid": "^11.4.1",
     "next": "^15.1.7",

@@ -76,9 +76,12 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Build & Deploy Pages
+      - name: Build with next-on-pages
+        if: env.CLOUDFLARE_API_TOKEN != ''
+        run: pnpm --filter @kb/web exec npx @cloudflare/next-on-pages
+
+      - name: Deploy to Pages
         if: env.CLOUDFLARE_API_TOKEN != ''
         run: |
           cd apps/web
-          npx @cloudflare/next-on-pages
           npx wrangler pages deploy .vercel/output/static --project-name=orangecloud-kb

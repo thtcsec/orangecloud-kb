@@ -1,5 +1,12 @@
 export const runtime = "edge";
 
+import { AdminNav } from "./AdminNav";
+
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
-  return children;
+  return (
+    <div className="flex h-screen overflow-hidden">
+      <AdminNav />
+      <main className="flex-1 overflow-y-auto">{children}</main>
+    </div>
+  );
 }

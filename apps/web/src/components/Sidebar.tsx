@@ -3,38 +3,41 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { BookOpen, Home, MessageSquare, Plus, Settings, ChevronsLeft, ChevronsRight } from "lucide-react";
+import { BookOpen, Home, MessageSquare, Plus, Settings, ChevronsLeft, ChevronsRight, Upload } from "lucide-react";
 import { useResolvedTheme } from "./ThemeProvider";
+import { useI18n } from "@/lib/i18n";
 import { useState } from "react";
-
-const links = [
-  { href: "/", label: "Trang chủ", icon: Home, exact: true },
-  { href: "/notes", label: "Ghi chú", icon: BookOpen, matchNotes: true },
-  { href: "/notes/new", label: "Tạo mới", icon: Plus },
-  { href: "/chat", label: "Hỏi đáp AI", icon: MessageSquare },
-  { href: "/settings", label: "Cài đặt", icon: Settings },
-];
-
-function isActive(pathname: string, href: string, exact?: boolean, matchNotes?: boolean): boolean {
-  if (exact) return pathname === href;
-  if (matchNotes) {
-    return pathname === "/notes" || (pathname.startsWith("/notes/") && !pathname.startsWith("/notes/new"));
-  }
-  return pathname === href || pathname.startsWith(`${href}/`);
-}
 
 export function Sidebar() {
   const pathname = usePathname();
   const resolvedTheme = useResolvedTheme();
+  const { t } = useI18n();
   const [collapsed, setCollapsed] = useState(false);
+
+  const links = [
+    { href: "/", label: t("nav.home"), icon: Home, exact: true },
+    { href: "/notes", label: t("nav.notes"), icon: BookOpen, matchNotes: true },
+    { href: "/notes/new", label: t("nav.new"), icon: Plus },
+    { href: "/notes/import", label: "Import .md", icon: Upload },
+    { href: "/chat", label: t("nav.chat"), icon: MessageSquare },
+    { href: "/settings", label: t("nav.settings"), icon: Settings },
+  ];
+
+  function isActive(href: string, exact?: boolean, matchNotes?: boolean): boolean {
+    if (exact) return pathname === href;
+    if (matchNotes) {
+      return pathname === "/notes" || (pathname.startsWith("/notes/") && !pathname.startsWith("/notes/new"));
+    }
+    return pathname === href || pathname.startsWith(`${href}/`);
+  }
 
   return (
     <aside
-      className={`flex h-screen flex-col border-r border-border bg-surface transition-all duration-200 ${
+      className={`flex h-full flex-col border-r border-border bg-surface transition-all duration-200 ${
         collapsed ? "w-16 p-2" : "w-64 p-4"
       }`}
     >
-      {/* Logo - clickable, larger via scale */}
+      {/* Logo */}
       <Link href="/" className={`relative mb-6 flex items-center justify-center ${collapsed ? "h-10" : "h-20"}`}>
         {!collapsed && (
           <>
@@ -70,7 +73,7 @@ export function Sidebar() {
       {/* Navigation */}
       <nav className="flex flex-1 flex-col gap-1">
         {links.map(({ href, label, icon: Icon, exact, matchNotes }) => {
-          const active = isActive(pathname, href, exact, matchNotes);
+          const active = isActive(href, exact, matchNotes);
 
           return (
             <Link
@@ -97,7 +100,7 @@ export function Sidebar() {
         type="button"
         onClick={() => setCollapsed(!collapsed)}
         className="mb-2 flex items-center justify-center rounded-lg p-2 text-muted transition hover:bg-surface-elevated hover:text-foreground"
-        title={collapsed ? "Mở rộng" : "Thu gọn"}
+        title={collapsed ? t("sidebar.expand") : t("sidebar.collapse")}
       >
         {collapsed ? <ChevronsRight size={18} /> : <ChevronsLeft size={18} />}
       </button>

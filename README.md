@@ -10,8 +10,6 @@
 
 Nền tảng wiki nội bộ dạng **Markdown**, hỗ trợ **semantic search** (tìm kiếm ngữ nghĩa), **hybrid retrieval** (FTS5 + Vector), và **RAG chat** (hỏi đáp AI dựa trên tri thức nội bộ) — tất cả chạy trên hạ tầng **edge** của Cloudflare, tối ưu chi phí và tốc độ tải toàn cầu.
 
-*(Repo nội bộ:* `orangecloud-kb` *— OrangeCloud chỉ là nickname dự án.)*
-
 Dự án được triển khai hoàn toàn trên nền tảng **Serverless Cloudflare-native** nhằm giảm tải hạ tầng quản trị, tối ưu chi phí vận hành, và đảm bảo tốc độ phản hồi cực nhanh tại biên mạng.
 
 ---

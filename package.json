@@ -14,7 +14,7 @@
     "db:migrate:remote": "pnpm --filter @kb/api-worker db:migrate:remote"
   },
   "engines": {
-    "node": ">=20"
+    "node": ">=22"
   },
   "packageManager": "pnpm@9.15.0"
 }

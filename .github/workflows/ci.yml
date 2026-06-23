@@ -52,7 +52,6 @@ jobs:
         if: env.CLOUDFLARE_API_TOKEN != ''
         run: |
           cd apps/api-worker
-          npx wrangler d1 migrations apply knowledge-base --remote
           npx wrangler deploy
 
   deploy-web:

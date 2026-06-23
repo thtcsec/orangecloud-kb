@@ -8,6 +8,7 @@ import { chatRoutes } from "./routes/chat";
 import { attachmentsRoutes } from "./routes/attachments";
 import { openapiRoutes } from "./routes/openapi";
 import { errorResponse } from "./lib/utils";
+import { rateLimiter } from "./lib/rate-limit";
 
 const app = new Hono<{ Bindings: Env }>();
 
@@ -31,6 +32,24 @@ app.use(
     credentials: true,
   }),
 );
+
+// Security headers
+app.use("*", async (c, next) => {
+  await next();
+  c.res.headers.set("X-Content-Type-Options", "nosniff");
+  c.res.headers.set("X-Frame-Options", "DENY");
+  c.res.headers.set("X-XSS-Protection", "1; mode=block");
+  c.res.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
+  c.res.headers.set("Permissions-Policy", "camera=(), microphone=(), geolocation=()");
+});
+
+// Global rate limit for write operations (30 req/min per IP)
+app.use("/api/*", async (c, next) => {
+  if (c.req.method === "GET" || c.req.method === "OPTIONS") {
+    return next();
+  }
+  return rateLimiter(30, 60_000)(c, next);
+});
 
 app.get("/health", (c) => c.json({ status: "ok", service: "knowledge-base-api" }));
 

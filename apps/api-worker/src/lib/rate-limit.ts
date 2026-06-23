@@ -28,7 +28,7 @@ export function rateLimiter(maxRequests = MAX_REQUESTS, windowMs = WINDOW_MS) {
       c.req.header("X-Forwarded-For")?.split(",")[0]?.trim() ??
       "unknown";
 
-    const key = `chat:${ip}`;
+    const key = `${c.req.path}:${ip}`;
     const now = Date.now();
 
     // Periodic cleanup (every 100 requests)

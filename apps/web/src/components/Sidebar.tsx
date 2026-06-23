@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { BookOpen, Home, MessageSquare, Plus, Settings } from "lucide-react";
+import { BookOpen, Home, MessageSquare, Plus, Settings, Shield } from "lucide-react";
 import { ThemeToggle } from "./ThemeToggle";
 import { useResolvedTheme } from "./ThemeProvider";
 
@@ -12,6 +12,7 @@ const links = [
   { href: "/notes", label: "Notes", icon: BookOpen, matchNotes: true },
   { href: "/notes/new", label: "New Note", icon: Plus },
   { href: "/chat", label: "Chat", icon: MessageSquare },
+  { href: "/admin", label: "Admin", icon: Shield },
   { href: "/settings", label: "Settings", icon: Settings },
 ];
 

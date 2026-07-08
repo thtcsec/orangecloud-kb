@@ -11,4 +11,5 @@ export interface Env {
   CHUNK_OVERLAP: string;
   GPT_MODEL: string;
   ALLOWED_ORIGINS?: string;
+  AI_GATEWAY_SLUG?: string;
 }

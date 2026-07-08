@@ -1,6 +1,7 @@
 import type { ChatResponse } from "@kb/shared";
 import type { Env } from "../env";
 import { buildContext, retrieveSources, SYSTEM_PROMPT } from "./chat-internals";
+import { getOpenAIBaseUrl } from "../lib/openai";
 
 interface OpenAIChatResponse {
   choices: Array<{
@@ -21,7 +22,8 @@ export async function chatWithRag(
   const sources = await retrieveSources(env, question, topK);
   const userMessage = buildContext(sources, question);
 
-  const response = await fetch("https://api.openai.com/v1/chat/completions", {
+  const baseUrl = getOpenAIBaseUrl(env);
+  const response = await fetch(`${baseUrl}/v1/chat/completions`, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${env.OPENAI_API_KEY}`,

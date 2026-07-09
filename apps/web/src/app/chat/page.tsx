@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { api } from "@/lib/api";
 import { MarkdownRenderer } from "@/components/MarkdownRenderer";
@@ -20,6 +20,7 @@ export default function ChatPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [isMounted, setIsMounted] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setIsMounted(true);
@@ -38,6 +39,10 @@ export default function ChatPage() {
       localStorage.setItem("kb_chat_history", JSON.stringify(messages));
     }
   }, [messages, isMounted]);
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -164,6 +169,7 @@ export default function ChatPage() {
             {msg.role === "user" && <User size={20} className="mt-1 shrink-0 text-muted" />}
           </div>
         ))}
+        <div ref={messagesEndRef} />
 
         {loading && (
           <div className="flex items-center gap-2 text-sm text-muted">

@@ -35,10 +35,11 @@ export function createChatStream(
 
         const userMessage = buildContext(sources, question);
         const baseUrl = getOpenAIBaseUrl(env);
+        const apiKey = env.OPENAI_API_KEY?.replace(/^\uFEFF/, "").trim();
         const response = await fetch(`${baseUrl}/chat/completions`, {
           method: "POST",
           headers: {
-            Authorization: `Bearer ${env.OPENAI_API_KEY}`,
+            Authorization: `Bearer ${apiKey}`,
             "Content-Type": "application/json",
           },
           body: JSON.stringify({

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { api } from "@/lib/api";
 import { MarkdownRenderer } from "@/components/MarkdownRenderer";
@@ -19,6 +19,25 @@ export default function ChatPage() {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+    const saved = localStorage.getItem("kb_chat_history");
+    if (saved) {
+      try {
+        setMessages(JSON.parse(saved));
+      } catch {
+        // ignore
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    if (isMounted) {
+      localStorage.setItem("kb_chat_history", JSON.stringify(messages));
+    }
+  }, [messages, isMounted]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -77,11 +96,24 @@ export default function ChatPage() {
 
   return (
     <div className="flex h-screen flex-col p-6">
-      <header className="mb-4">
-        <h1 className="text-2xl font-bold">Hỏi đáp AI</h1>
-        <p className="text-sm text-muted">
-          Hybrid search (FTS + Vector) · Streaming responses
-        </p>
+      <header className="mb-4 flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold">Hỏi đáp AI</h1>
+          <p className="text-sm text-muted">
+            Hybrid search (FTS + Vector) · Streaming responses
+          </p>
+        </div>
+        {isMounted && messages.length > 0 && (
+          <button
+            onClick={() => {
+              setMessages([]);
+              localStorage.removeItem("kb_chat_history");
+            }}
+            className="rounded-lg border border-border px-3 py-1.5 text-xs font-medium hover:bg-surface-elevated text-red-500 hover:text-red-600 transition-colors"
+          >
+            Xóa lịch sử
+          </button>
+        )}
       </header>
 
       <div className="flex-1 space-y-4 overflow-auto rounded-xl border border-border bg-surface p-4">

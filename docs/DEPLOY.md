@@ -27,9 +27,9 @@ wrangler deploy
 cd apps/web
 # .env.production hoặc export:
 # NEXT_PUBLIC_API_URL=https://knowledge-base-api.<subdomain>.workers.dev
-pnpm build
+pnpm pages:build
 npx wrangler pages project create knowledge-base-web
-npx wrangler pages deploy .next --project-name=knowledge-base-web
+npx wrangler pages deploy .vercel/output/static --project-name=knowledge-base-web
 ```
 
 ## 4. GitHub Actions (tự động)

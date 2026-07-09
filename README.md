@@ -163,8 +163,8 @@ pnpm --filter @kb/api-worker deploy
 
 # Frontend (Cloudflare Pages)
 cd apps/web
-NEXT_PUBLIC_API_URL=https://your-worker.workers.dev pnpm build
-npx wrangler pages deploy .next --project-name=knowledge-base-web
+NEXT_PUBLIC_API_URL=https://your-worker.workers.dev pnpm pages:build
+npx wrangler pages deploy .vercel/output/static --project-name=knowledge-base-web
 ```
 
 ### 5. GitHub Actions (tự động)

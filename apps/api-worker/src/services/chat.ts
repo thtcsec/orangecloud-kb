@@ -23,7 +23,7 @@ export async function chatWithRag(
   const userMessage = buildContext(sources, question);
 
   const baseUrl = getOpenAIBaseUrl(env);
-  const response = await fetch(`${baseUrl}/v1/chat/completions`, {
+  const response = await fetch(`${baseUrl}/chat/completions`, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${env.OPENAI_API_KEY}`,

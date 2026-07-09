@@ -1,4 +1,4 @@
-import type { ChatResponse, Comment, CommentInput, Note, NoteInput, SearchResult } from "@kb/shared";
+import type { ChatResponse, Comment, CommentInput, Note, NoteInput, SearchResult, ChatMessage } from "@kb/shared";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8787";
 
@@ -70,17 +70,17 @@ export const api = {
       }),
   },
   chat: {
-    ask: (question: string, topK = 5) =>
+    ask: (question: string, history: ChatMessage[] = [], topK = 5) =>
       request<ChatResponse>("/api/chat", {
         method: "POST",
-        body: JSON.stringify({ question, topK }),
+        body: JSON.stringify({ question, history, topK }),
       }),
-    askStream: async (question: string, handlers: ChatStreamHandlers, topK = 5) => {
+    askStream: async (question: string, history: ChatMessage[] = [], handlers: ChatStreamHandlers, topK = 5) => {
       const response = await fetch(`${API_URL}/api/chat`, {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ question, topK, stream: true }),
+        body: JSON.stringify({ question, history, topK, stream: true }),
       });
 
       if (!response.ok || !response.body) {

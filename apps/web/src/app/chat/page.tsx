@@ -45,6 +45,12 @@ export default function ChatPage() {
 
     const question = input.trim();
     setInput("");
+    
+    const history = messages.map((m) => ({
+      role: m.role,
+      content: m.content,
+    }));
+
     setMessages((prev) => [...prev, { role: "user", content: question }]);
     setLoading(true);
     setError("");
@@ -53,7 +59,7 @@ export default function ChatPage() {
     setMessages((prev) => [...prev, { role: "assistant", content: "", streaming: true }]);
 
     try {
-      await api.chat.askStream(question, {
+      await api.chat.askStream(question, history, {
         onSources: (sources) => {
           setMessages((prev) => {
             const next = [...prev];

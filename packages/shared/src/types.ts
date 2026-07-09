@@ -47,8 +47,14 @@ export interface NoteListQuery {
   q?: string;
 }
 
+export interface ChatMessage {
+  role: "user" | "assistant";
+  content: string;
+}
+
 export interface ChatRequest {
   question: string;
+  history?: ChatMessage[];
   topK?: number;
   stream?: boolean;
 }

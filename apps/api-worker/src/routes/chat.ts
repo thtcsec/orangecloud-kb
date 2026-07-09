@@ -4,6 +4,7 @@ import { errorResponse, jsonResponse } from "../lib/utils";
 import { rateLimiter } from "../lib/rate-limit";
 import { chatWithRag } from "../services/chat";
 import { createChatStream } from "../services/chat-stream";
+import type { ChatMessage } from "@kb/shared";
 
 export const chatRoutes = new Hono<{ Bindings: Env }>();
 
@@ -11,7 +12,7 @@ export const chatRoutes = new Hono<{ Bindings: Env }>();
 chatRoutes.use("*", rateLimiter(10, 60_000));
 
 chatRoutes.post("/", async (c) => {
-  const body = await c.req.json<{ question?: string; topK?: number; stream?: boolean }>();
+  const body = await c.req.json<{ question?: string; history?: ChatMessage[]; topK?: number; stream?: boolean }>();
   if (!body.question?.trim()) {
     return errorResponse("question is required", 400);
   }
@@ -24,9 +25,10 @@ chatRoutes.post("/", async (c) => {
   }
 
   const topK = Math.min(body.topK ?? 5, 10);
+  const history = body.history ?? [];
 
   if (body.stream) {
-    return new Response(createChatStream(c.env, question, topK), {
+    return new Response(createChatStream(c.env, question, history, topK), {
       headers: {
         "Content-Type": "text/event-stream; charset=utf-8",
         "Cache-Control": "no-cache, no-transform",
@@ -36,7 +38,7 @@ chatRoutes.post("/", async (c) => {
   }
 
   try {
-    const result = await chatWithRag(c.env, question, topK);
+    const result = await chatWithRag(c.env, question, history, topK);
     return jsonResponse(result);
   } catch (err) {
     const message = err instanceof Error ? err.message : "Chat failed";

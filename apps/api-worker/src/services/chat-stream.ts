@@ -1,4 +1,4 @@
-import type { SearchResult } from "@kb/shared";
+import type { SearchResult, ChatMessage } from "@kb/shared";
 import type { Env } from "../env";
 import { buildContext, retrieveSources, SYSTEM_PROMPT } from "./chat-internals";
 import { getOpenAIBaseUrl } from "../lib/openai";
@@ -13,6 +13,7 @@ interface StreamEvent {
 export function createChatStream(
   env: Env,
   question: string,
+  history: ChatMessage[] = [],
   topK = 5,
 ): ReadableStream<Uint8Array> {
   const encoder = new TextEncoder();
@@ -36,6 +37,8 @@ export function createChatStream(
         const userMessage = buildContext(sources, question);
         const baseUrl = getOpenAIBaseUrl(env);
         const apiKey = env.OPENAI_API_KEY?.replace(/^\uFEFF/, "").trim();
+        const limitedHistory = history.slice(-10);
+
         const response = await fetch(`${baseUrl}/chat/completions`, {
           method: "POST",
           headers: {
@@ -47,6 +50,7 @@ export function createChatStream(
             stream: true,
             messages: [
               { role: "system", content: SYSTEM_PROMPT },
+              ...limitedHistory,
               { role: "user", content: userMessage },
             ],
             temperature: 0.3,

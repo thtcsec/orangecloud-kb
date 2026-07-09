@@ -1,4 +1,4 @@
-import type { ChatResponse } from "@kb/shared";
+import type { ChatResponse, ChatMessage } from "@kb/shared";
 import type { Env } from "../env";
 import { buildContext, retrieveSources, SYSTEM_PROMPT } from "./chat-internals";
 import { getOpenAIBaseUrl } from "../lib/openai";
@@ -17,6 +17,7 @@ interface OpenAIChatResponse {
 export async function chatWithRag(
   env: Env,
   question: string,
+  history: ChatMessage[] = [],
   topK = 5,
 ): Promise<ChatResponse> {
   const sources = await retrieveSources(env, question, topK);
@@ -24,6 +25,8 @@ export async function chatWithRag(
 
   const baseUrl = getOpenAIBaseUrl(env);
   const apiKey = env.OPENAI_API_KEY?.replace(/^\uFEFF/, "").trim();
+  const limitedHistory = history.slice(-10);
+
   const response = await fetch(`${baseUrl}/chat/completions`, {
     method: "POST",
     headers: {
@@ -34,6 +37,7 @@ export async function chatWithRag(
       model: env.GPT_MODEL,
       messages: [
         { role: "system", content: SYSTEM_PROMPT },
+        ...limitedHistory,
         { role: "user", content: userMessage },
       ],
       temperature: 0.3,

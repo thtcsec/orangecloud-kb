@@ -12,3 +12,6 @@ dist/
 .turbo/
 .vercel/
 *.tsbuildinfo
+
+# Temp files
+.tmp-*

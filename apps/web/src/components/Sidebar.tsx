@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { BookOpen, Home, MessageSquare, Plus, Settings, ChevronsLeft, ChevronsRight, Upload } from "lucide-react";
+import { BookOpen, Home, MessageSquare, Plus, Settings, ChevronsLeft, ChevronsRight } from "lucide-react";
 import { useResolvedTheme } from "./ThemeProvider";
 import { useI18n } from "@/lib/i18n";
 import { useState } from "react";
@@ -18,7 +18,6 @@ export function Sidebar() {
     { href: "/", label: t("nav.home"), icon: Home, exact: true },
     { href: "/notes", label: t("nav.notes"), icon: BookOpen, matchNotes: true },
     { href: "/notes/new", label: t("nav.new"), icon: Plus },
-    { href: "/notes/import", label: "Import .md", icon: Upload },
     { href: "/chat", label: t("nav.chat"), icon: MessageSquare },
     { href: "/settings", label: t("nav.settings"), icon: Settings },
   ];

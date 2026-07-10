@@ -44,7 +44,7 @@ export default function DashboardPage() {
         <p className="mt-1 text-muted">Tổng quan hệ thống tri thức nội bộ</p>
       </header>
 
-      <div className="mb-8 grid grid-cols-2 gap-4 lg:grid-cols-4">
+      <div className="mb-8 grid grid-cols-2 gap-4 lg:grid-cols-4 stagger-children">
         {statCards.map((card) => (
           <div key={card.label} className="rounded-xl border border-border bg-surface p-4">
             <div className="mb-2 flex items-center justify-between">

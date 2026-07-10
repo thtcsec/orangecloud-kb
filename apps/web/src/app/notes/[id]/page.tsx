@@ -9,7 +9,7 @@ import { MarkdownRenderer } from "@/components/MarkdownRenderer";
 import { CommentsSection } from "@/components/CommentsSection";
 import { ClientDate } from "@/components/ClientDate";
 import type { Comment, Note } from "@kb/shared";
-import { Pencil, Trash2 } from "lucide-react";
+import { Pencil, Trash2, ChevronLeft } from "lucide-react";
 
 export default function NoteDetailPage() {
   const params = useParams();
@@ -41,12 +41,28 @@ export default function NoteDetailPage() {
   }
 
   if (error) return <div className="p-6 text-red-400">{error}</div>;
-  if (!note) return <div className="p-6 text-muted">Đang tải...</div>;
+  if (!note) return (
+    <div className="mx-auto max-w-4xl p-6">
+      <div className="animate-pulse space-y-4">
+        <div className="h-8 w-2/3 rounded bg-surface-elevated" />
+        <div className="h-4 w-1/3 rounded bg-surface-elevated" />
+        <div className="mt-8 space-y-3">
+          <div className="h-4 w-full rounded bg-surface-elevated" />
+          <div className="h-4 w-5/6 rounded bg-surface-elevated" />
+          <div className="h-4 w-4/6 rounded bg-surface-elevated" />
+        </div>
+      </div>
+    </div>
+  );
 
   const tags = parseTags(note.tags);
 
   return (
     <article className="mx-auto max-w-4xl p-6">
+      {/* Back button */}
+      <Link href="/notes" className="mb-4 inline-flex items-center gap-1 text-sm text-muted hover:text-foreground transition-colors">
+        <ChevronLeft size={16} /> Quay lại danh sách
+      </Link>
       <header className="mb-6 border-b border-border pb-6">
         <div className="mb-4 flex items-start justify-between gap-4">
           <div>

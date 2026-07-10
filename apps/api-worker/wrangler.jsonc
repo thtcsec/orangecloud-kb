@@ -10,6 +10,7 @@
 	// Cloudspace: 4c15704ef706b9c8954cd6f9feb678d8
 	// Tht.csec2005@gmail.com: d26517432bff17b8889b98cc366c70f1
 	"account_id": "4c15704ef706b9c8954cd6f9feb678d8",
+	"workers_dev": true,
 	"vars": {
 		"EMBEDDING_MODEL": "@cf/baai/bge-small-en-v1.5",
 		"CHUNK_SIZE": "500",
@@ -42,5 +43,11 @@
 	"ai": {
 		"binding": "AI",
 		"remote": true
-	}
+	},
+	"routes": [
+		{
+			"pattern": "kb-api.orangecloud.vn",
+			"custom_domain": true
+		}
+	]
 }

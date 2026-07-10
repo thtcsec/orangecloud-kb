@@ -6,7 +6,7 @@ import { api } from "@/lib/api";
 import { NoteCard } from "@/components/NoteCard";
 import { useI18n } from "@/lib/i18n";
 import { useToast } from "@/components/Toast";
-import { Search, ChevronLeft, Folder, FolderOpen, PanelLeftClose, PanelLeft, FolderInput } from "lucide-react";
+import { Search, ChevronLeft, Folder, FolderOpen, PanelLeftClose, PanelLeft, FolderInput, FolderPlus } from "lucide-react";
 
 export default function NotesPage() {
   const { t } = useI18n();
@@ -108,6 +108,16 @@ export default function NotesPage() {
             </button>
           ))}
           {folders.length === 0 && <p className="text-xs text-muted">{t("folders.empty")}</p>}
+
+          {/* Create new folder inline */}
+          <NewFolderInput
+            onCreated={(name) => {
+              if (!folders.includes(name)) {
+                setFolders([...folders, name]);
+              }
+              setSelectedFolder(name);
+            }}
+          />
         </aside>
       )}
 
@@ -189,5 +199,52 @@ export default function NotesPage() {
         )}
       </div>
     </div>
+  );
+}
+
+
+function NewFolderInput({ onCreated }: { onCreated: (name: string) => void }) {
+  const [open, setOpen] = useState(false);
+  const [name, setName] = useState("");
+
+  function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    const trimmed = name.trim();
+    if (!trimmed) return;
+    onCreated(trimmed);
+    setName("");
+    setOpen(false);
+  }
+
+  if (!open) {
+    return (
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        className="mt-2 flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-xs text-muted hover:text-accent transition-colors"
+      >
+        <FolderPlus size={14} />
+        Tạo thư mục
+      </button>
+    );
+  }
+
+  return (
+    <form onSubmit={handleSubmit} className="mt-2 flex gap-1 animate-fade-in">
+      <input
+        value={name}
+        onChange={(e) => setName(e.target.value)}
+        placeholder="Tên thư mục"
+        className="flex-1 px-2 py-1 text-xs border border-border rounded bg-surface-elevated"
+        autoFocus
+        onBlur={() => { if (!name.trim()) setOpen(false); }}
+      />
+      <button
+        type="submit"
+        className="shrink-0 rounded bg-accent px-2 py-1 text-xs font-medium text-black"
+      >
+        +
+      </button>
+    </form>
   );
 }

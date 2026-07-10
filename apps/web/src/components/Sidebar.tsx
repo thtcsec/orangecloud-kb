@@ -3,16 +3,14 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { BookOpen, Home, MessageSquare, Plus, Settings, ChevronsLeft, ChevronsRight } from "lucide-react";
+import { BookOpen, Home, MessageSquare, Plus, Settings } from "lucide-react";
 import { useResolvedTheme } from "./ThemeProvider";
 import { useI18n } from "@/lib/i18n";
-import { useState } from "react";
 
 export function Sidebar() {
   const pathname = usePathname();
   const resolvedTheme = useResolvedTheme();
   const { t } = useI18n();
-  const [collapsed, setCollapsed] = useState(false);
 
   const links = [
     { href: "/", label: t("nav.home"), icon: Home, exact: true },
@@ -31,87 +29,58 @@ export function Sidebar() {
   }
 
   return (
-    <aside
-      className={`flex h-full flex-col border-r border-border bg-surface transition-all duration-200 ${
-        collapsed ? "w-16 p-2" : "w-64 p-4"
-      }`}
-    >
-      {/* Logo */}
-      <Link href="/" className={`relative mb-6 flex items-center justify-center ${collapsed ? "h-10" : "h-20"}`}>
-        {!collapsed && (
-          <>
-            <Image
-              src="/logo-light.png"
-              alt="OrangeCloud Knowledge Base"
-              width={240}
-              height={64}
-              priority
-              className={`absolute max-w-none transition-opacity duration-300 ease-in-out object-contain ${
-                resolvedTheme === "light" ? "opacity-100" : "opacity-0"
-              }`}
-              style={{ width: "240px", height: "auto" }}
-            />
-            <Image
-              src="/logo-dark.png"
-              alt="OrangeCloud Knowledge Base"
-              width={240}
-              height={64}
-              priority
-              className={`absolute max-w-none transition-opacity duration-300 ease-in-out object-contain ${
-                resolvedTheme === "dark" ? "opacity-100" : "opacity-0"
-              }`}
-              style={{ width: "240px", height: "auto" }}
-            />
-          </>
-        )}
-        {collapsed && (
-          <span className="text-xl font-bold text-accent">KB</span>
-        )}
+    <aside className="flex h-screen w-64 shrink-0 flex-col border-r border-border bg-surface p-4">
+      {/* Logo — click to go home */}
+      <Link href="/" className="relative mb-6 flex items-center justify-center h-16 overflow-hidden">
+        <Image
+          src="/logo-light.png"
+          alt="OrangeCloud Knowledge Base"
+          width={200}
+          height={52}
+          priority
+          className={`absolute transition-opacity duration-300 ease-in-out object-contain ${
+            resolvedTheme === "light" ? "opacity-100" : "opacity-0"
+          }`}
+        />
+        <Image
+          src="/logo-dark.png"
+          alt="OrangeCloud Knowledge Base"
+          width={200}
+          height={52}
+          priority
+          className={`absolute transition-opacity duration-300 ease-in-out object-contain ${
+            resolvedTheme === "dark" ? "opacity-100" : "opacity-0"
+          }`}
+        />
       </Link>
 
       {/* Navigation */}
       <nav className="flex flex-1 flex-col gap-1">
         {links.map(({ href, label, icon: Icon, exact, matchNotes }) => {
           const active = isActive(href, exact, matchNotes);
-
           return (
             <Link
               key={href}
               href={href}
-              title={collapsed ? label : undefined}
-              className={`relative flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition ${
-                collapsed ? "justify-center px-2" : ""
-              } ${
+              className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors ${
                 active
                   ? "bg-accent/10 text-accent border border-accent/20"
                   : "text-muted hover:bg-surface-elevated hover:text-foreground"
               }`}
             >
               <Icon size={18} />
-              {!collapsed && label}
+              {label}
             </Link>
           );
         })}
       </nav>
 
-      {/* Collapse toggle */}
-      <button
-        type="button"
-        onClick={() => setCollapsed(!collapsed)}
-        className="mb-2 flex items-center justify-center rounded-lg p-2 text-muted transition hover:bg-surface-elevated hover:text-foreground"
-        title={collapsed ? t("sidebar.expand") : t("sidebar.collapse")}
-      >
-        {collapsed ? <ChevronsRight size={18} /> : <ChevronsLeft size={18} />}
-      </button>
-
       {/* Footer */}
-      {!collapsed && (
-        <div className="border-t border-border pt-3 px-2">
-          <p className="text-[10px] text-muted leading-relaxed">
-            Built by <span className="text-foreground font-medium">Trinh Hoang Tu</span> &amp; <span className="text-foreground font-medium">Le Sy Cuong</span>
-          </p>
-        </div>
-      )}
+      <div className="border-t border-border pt-3 px-2">
+        <p className="text-[10px] text-muted leading-relaxed">
+          Built by <span className="text-foreground font-medium">Trinh Hoang Tu</span> &amp; <span className="text-foreground font-medium">Le Sy Cuong</span>
+        </p>
+      </div>
     </aside>
   );
 }

@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { api } from "@/lib/api";
 import { NoteCard } from "@/components/NoteCard";
-import { PageTransition, StaggerContainer, StaggerItem } from "@/components/motion";
+import { useI18n } from "@/lib/i18n";
 import { Search, FileText, MessageSquare, BookOpen } from "lucide-react";
 
 export default function DashboardPage() {
@@ -38,26 +38,23 @@ export default function DashboardPage() {
   ];
 
   return (
-    <PageTransition>
     <div className="p-8">
       <header className="mb-8">
         <h1 className="text-3xl font-bold">Trang chủ</h1>
         <p className="mt-1 text-muted">Tổng quan hệ thống tri thức nội bộ</p>
       </header>
 
-      <StaggerContainer className="mb-8 grid grid-cols-2 gap-4 lg:grid-cols-4">
+      <div className="mb-8 grid grid-cols-2 gap-4 lg:grid-cols-4">
         {statCards.map((card) => (
-          <StaggerItem key={card.label}>
-            <div className="rounded-xl border border-border bg-surface p-4">
-              <div className="mb-2 flex items-center justify-between">
-                <span className="text-sm text-muted">{card.label}</span>
-                <card.icon size={18} className="text-accent" />
-              </div>
-              <p className="text-3xl font-bold">{loading ? "—" : card.value}</p>
+          <div key={card.label} className="rounded-xl border border-border bg-surface p-4">
+            <div className="mb-2 flex items-center justify-between">
+              <span className="text-sm text-muted">{card.label}</span>
+              <card.icon size={18} className="text-accent" />
             </div>
-          </StaggerItem>
+            <p className="text-3xl font-bold">{loading ? "—" : card.value}</p>
+          </div>
         ))}
-      </StaggerContainer>
+      </div>
 
       <form onSubmit={handleSearch} className="mb-8 flex gap-2">
         <div className="relative flex-1">
@@ -107,6 +104,5 @@ export default function DashboardPage() {
         </section>
       )}
     </div>
-    </PageTransition>
   );
 }

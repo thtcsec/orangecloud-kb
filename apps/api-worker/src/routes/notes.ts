@@ -1,7 +1,6 @@
 import { Hono } from "hono";
 import type { NoteInput } from "@kb/shared";
 import type { Env } from "../env";
-import { requireAuth } from "./auth";
 import { errorResponse, jsonResponse } from "../lib/utils";
 import * as notesService from "../services/notes";
 import * as commentsService from "../services/comments";
@@ -64,9 +63,6 @@ notesRoutes.get("/:id", async (c) => {
 });
 
 notesRoutes.post("/", async (c) => {
-  const authError = await requireAuth(c);
-  if (authError) return authError;
-
   const body = await c.req.json<NoteInput>();
   if (!body.title?.trim() || !body.content || !body.author?.trim()) {
     return errorResponse("title, content, and author are required", 400);
@@ -86,9 +82,6 @@ notesRoutes.post("/", async (c) => {
 });
 
 notesRoutes.put("/:id", async (c) => {
-  const authError = await requireAuth(c);
-  if (authError) return authError;
-
   const body = await c.req.json<Partial<NoteInput>>();
   const note = await notesService.updateNote(c.env.DB, c.req.param("id"), body);
   if (!note) return errorResponse("Note not found", 404);
@@ -111,9 +104,6 @@ notesRoutes.put("/:id", async (c) => {
 });
 
 notesRoutes.delete("/:id", async (c) => {
-  const authError = await requireAuth(c);
-  if (authError) return authError;
-
   const id = c.req.param("id");
   try {
     await deleteNoteVectors(c.env, id);

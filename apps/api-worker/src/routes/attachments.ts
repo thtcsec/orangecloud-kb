@@ -1,6 +1,5 @@
 import { Hono } from "hono";
 import type { Env } from "../env";
-import { requireAuth } from "./auth";
 import { errorResponse, jsonResponse } from "../lib/utils";
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024;
@@ -22,9 +21,6 @@ function sanitizeFilename(name: string): string {
 export const attachmentsRoutes = new Hono<{ Bindings: Env }>();
 
 attachmentsRoutes.post("/", async (c) => {
-  const authError = await requireAuth(c);
-  if (authError) return authError;
-
   const formData = await c.req.formData();
   const fileEntry = formData.get("file");
 

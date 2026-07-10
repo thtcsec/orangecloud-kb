@@ -232,22 +232,30 @@ function ImportMode() {
 
       {/* Processing indicator */}
       {processing && (
-        <div className="flex items-center gap-3 rounded-lg border border-accent/30 bg-accent/5 p-4">
+        <div className="flex items-center gap-3 rounded-lg border border-accent/30 bg-accent/5 p-4 animate-fade-in">
           <div className="h-5 w-5 animate-spin rounded-full border-2 border-accent border-t-transparent" />
-          <span className="text-sm font-medium">{t("upload.processing")}</span>
+          <div className="flex-1">
+            <span className="text-sm font-medium">{t("upload.processing")}</span>
+            <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-surface-elevated">
+              <div
+                className="h-full rounded-full bg-accent transition-all duration-500 ease-out"
+                style={{ width: `${results.length > 0 ? (results.length / Math.max(results.length + 1, 1)) * 100 : 10}%` }}
+              />
+            </div>
+          </div>
         </div>
       )}
 
       {/* Results */}
       {results.length > 0 && (
-        <div className="space-y-2">
+        <div className="space-y-2 animate-fade-up">
           <p className="text-sm font-medium">
             {successCount}/{results.length} file import thành công
           </p>
           {results.map((r, i) => (
             <div
               key={i}
-              className={`flex items-center gap-3 rounded-lg border p-3 text-sm transition-all ${
+              className={`flex items-center gap-3 rounded-lg border p-3 text-sm animate-slide-in ${
                 r.status === "success"
                   ? "border-green-500/30 bg-green-500/5"
                   : "border-red-500/30 bg-red-500/5"

@@ -1,14 +1,16 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import { api } from "@/lib/api";
 import { NoteCard } from "@/components/NoteCard";
 import { useI18n } from "@/lib/i18n";
-import { Search, ChevronLeft, Folder, FolderOpen, PanelLeftClose, PanelLeft } from "lucide-react";
+import { useToast } from "@/components/Toast";
+import { Search, ChevronLeft, Folder, FolderOpen, PanelLeftClose, PanelLeft, FolderInput } from "lucide-react";
 
 export default function NotesPage() {
   const { t } = useI18n();
+  const { toast } = useToast();
   const [notes, setNotes] = useState<Awaited<ReturnType<typeof api.notes.list>>>([]);
   const [folders, setFolders] = useState<string[]>([]);
   const [tags, setTags] = useState<string[]>([]);
@@ -17,13 +19,14 @@ export default function NotesPage() {
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
   const [folderOpen, setFolderOpen] = useState(true);
+  const [dragOverFolder, setDragOverFolder] = useState<string | null>(null);
 
   useEffect(() => {
     api.notes.folders().then(setFolders);
     api.notes.tags().then(setTags);
   }, []);
 
-  useEffect(() => {
+  const fetchNotes = useCallback(() => {
     setLoading(true);
     const params: Record<string, string> = {};
     if (selectedFolder) params.folder = selectedFolder;
@@ -36,9 +39,23 @@ export default function NotesPage() {
       .finally(() => setLoading(false));
   }, [selectedFolder, selectedTag, search]);
 
+  useEffect(() => { fetchNotes(); }, [fetchNotes]);
+
+  async function handleDropOnFolder(folder: string, noteId: string) {
+    setDragOverFolder(null);
+    try {
+      await api.notes.update(noteId, { folder });
+      toast(`Đã chuyển vào thư mục "${folder}"`, "success");
+      fetchNotes();
+      api.notes.folders().then(setFolders);
+    } catch {
+      toast("Không thể di chuyển ghi chú", "error");
+    }
+  }
+
   return (
     <div className="flex h-full">
-      {/* Folder sidebar — collapsible */}
+      {/* Folder sidebar — collapsible, drop targets */}
       {folderOpen && (
         <aside className="w-52 shrink-0 border-r border-border p-4 animate-fade-in">
           <div className="mb-3 flex items-center justify-between">
@@ -52,6 +69,9 @@ export default function NotesPage() {
               <PanelLeftClose size={14} />
             </button>
           </div>
+
+          <p className="mb-2 text-[10px] text-muted italic">Kéo thả note vào thư mục</p>
+
           <button
             type="button"
             onClick={() => setSelectedFolder(undefined)}
@@ -62,16 +82,28 @@ export default function NotesPage() {
             <FolderOpen size={16} />
             {t("folders.all")}
           </button>
+
           {folders.map((folder) => (
             <button
               key={folder}
               type="button"
               onClick={() => setSelectedFolder(folder)}
-              className={`mb-1 flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left text-sm transition-colors ${
-                selectedFolder === folder ? "bg-accent/10 text-accent" : "text-muted hover:text-foreground"
+              onDragOver={(e) => { e.preventDefault(); setDragOverFolder(folder); }}
+              onDragLeave={() => setDragOverFolder(null)}
+              onDrop={(e) => {
+                e.preventDefault();
+                const noteId = e.dataTransfer.getData("text/note-id");
+                if (noteId) handleDropOnFolder(folder, noteId);
+              }}
+              className={`mb-1 flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left text-sm transition-all ${
+                dragOverFolder === folder
+                  ? "bg-accent/20 text-accent border border-accent/50 scale-[1.02]"
+                  : selectedFolder === folder
+                    ? "bg-accent/10 text-accent"
+                    : "text-muted hover:text-foreground"
               }`}
             >
-              <Folder size={16} />
+              {dragOverFolder === folder ? <FolderInput size={16} /> : <Folder size={16} />}
               <span className="truncate">{folder}</span>
             </button>
           ))}
@@ -150,7 +182,7 @@ export default function NotesPage() {
         ) : (
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3 stagger-children">
             {notes.map((note) => (
-              <NoteCard key={note.id} note={note} />
+              <NoteCard key={note.id} note={note} draggable />
             ))}
             {notes.length === 0 && <p className="text-muted">{t("notes.notFound")}</p>}
           </div>

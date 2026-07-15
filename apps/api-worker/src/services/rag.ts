@@ -45,7 +45,15 @@ export async function syncNoteEmbeddings(env: Env, note: Note): Promise<number> 
     return 0;
   }
 
-  const texts = chunks.map((c) => `${note.title}\n\n${c.text}`);
+  const header = [
+    note.title,
+    note.folder ? `Folder: ${note.folder}` : null,
+    note.tags ? `Tags: ${note.tags}` : null,
+  ]
+    .filter(Boolean)
+    .join("\n");
+  // Embed title/folder/tags with each chunk so semantic queries hit metadata too
+  const texts = chunks.map((c) => `${header}\n\n${c.text}`);
   const embeddings = await generateEmbeddings(env, texts);
 
   const vectors = chunks.map((chunk, i) => ({

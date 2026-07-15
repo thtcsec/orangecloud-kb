@@ -1,6 +1,6 @@
 import type { Note, NoteAudit, NoteAuditAction, NoteInput, NoteListQuery } from "@kb/shared";
 import type { Env } from "../env";
-import { escapeFtsQuery, generateId, nowIso } from "../lib/utils";
+import { escapeFtsQuery, escapeLike, generateId, normalizeTags, nowIso, tagEqualsSql } from "../lib/utils";
 
 async function writeAudit(
   db: D1Database,
@@ -40,37 +40,36 @@ export async function listNoteAudit(db: D1Database, noteId: string): Promise<Not
 }
 
 export async function listNotes(db: D1Database, query: NoteListQuery): Promise<Note[]> {
+  const useFts = Boolean(escapeFtsQuery(query.q ?? ""));
+  const alias = useFts ? "n." : "";
   const conditions: string[] = [];
   const params: unknown[] = [];
 
   if (query.folder) {
-    conditions.push("folder = ?");
+    conditions.push(`${alias}folder = ?`);
     params.push(query.folder);
   }
   if (query.status) {
-    conditions.push("status = ?");
+    conditions.push(`${alias}status = ?`);
     params.push(query.status);
   }
-  if (query.tag) {
-    conditions.push("(',' || COALESCE(tags, '') || ',') LIKE ?");
-    params.push(`%,${query.tag},%`);
+  if (query.tag?.trim()) {
+    const tag = query.tag.trim();
+    conditions.push(tagEqualsSql(`${alias}tags`));
+    params.push(`%,${escapeLike(tag)},%`);
   }
 
   let sql: string;
-  if (query.q?.trim()) {
-    const ftsQuery = escapeFtsQuery(query.q);
-    if (ftsQuery) {
-      sql = `
-        SELECT n.* FROM notes n
-        INNER JOIN notes_fts fts ON fts.rowid = n.rowid
-        WHERE notes_fts MATCH ?
-        ${conditions.length ? `AND ${conditions.join(" AND ")}` : ""}
-        ORDER BY n.updated_at DESC
-      `;
-      params.unshift(ftsQuery);
-    } else {
-      sql = buildListSql(conditions);
-    }
+  if (useFts) {
+    const ftsQuery = escapeFtsQuery(query.q ?? "");
+    sql = `
+      SELECT n.* FROM notes n
+      INNER JOIN notes_fts ON notes_fts.rowid = n.rowid
+      WHERE notes_fts MATCH ?
+      ${conditions.length ? `AND ${conditions.join(" AND ")}` : ""}
+      ORDER BY n.updated_at DESC
+    `;
+    params.unshift(ftsQuery);
   } else {
     sql = buildListSql(conditions);
   }
@@ -96,7 +95,7 @@ export async function createNote(db: D1Database, input: NoteInput): Promise<Note
     title: input.title.trim(),
     content: input.content,
     author: input.author.trim(),
-    tags: input.tags?.trim() || null,
+    tags: normalizeTags(input.tags),
     folder: input.folder?.trim() || null,
     status: input.status ?? "draft",
     created_at: timestamp,
@@ -150,7 +149,7 @@ export async function updateNote(
     title: input.title?.trim() ?? existing.title,
     content: input.content ?? existing.content,
     author: input.author?.trim() ?? existing.author,
-    tags: input.tags !== undefined ? input.tags.trim() || null : existing.tags,
+    tags: input.tags !== undefined ? normalizeTags(input.tags) : existing.tags,
     folder: input.folder !== undefined ? input.folder.trim() || null : existing.folder,
     status: input.status ?? existing.status,
     created_at: existing.created_at,

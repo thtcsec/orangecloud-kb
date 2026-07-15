@@ -116,11 +116,16 @@ export default function ChatPage() {
         </div>
         {isMounted && messages.length > 0 && (
           <button
+            type="button"
             onClick={() => {
+              const ok = window.confirm(
+                "Xóa toàn bộ lịch sử chat?\n\nHành động này không thể hoàn tác. Các câu hỏi và câu trả lời đã lưu trên trình duyệt sẽ bị xóa.",
+              );
+              if (!ok) return;
               setMessages([]);
               localStorage.removeItem("kb_chat_history");
             }}
-            className="rounded-lg border border-border px-3 py-1.5 text-xs font-medium hover:bg-surface-elevated text-red-500 hover:text-red-600 transition-colors"
+            className="rounded-lg border border-red-500/40 px-3 py-1.5 text-xs font-medium text-red-500 transition-colors hover:bg-red-500/10 hover:text-red-400"
           >
             Xóa lịch sử
           </button>

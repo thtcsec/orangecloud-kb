@@ -21,6 +21,27 @@ export function parseTags(tags: string | null | undefined): string[] {
     .filter(Boolean);
 }
 
+/** Plain-text preview for note cards — strip markdown syntax noise. */
+export function stripMarkdownPreview(content: string, maxLen = 140): string {
+  let text = content
+    .replace(/```[\s\S]*?```/g, " ")
+    .replace(/`[^`]+`/g, " ")
+    .replace(/^#{1,6}\s+/gm, "")
+    .replace(/!\[[^\]]*\]\([^)]*\)/g, "")
+    .replace(/\[([^\]]+)\]\([^)]*\)/g, "$1")
+    .replace(/(\*\*|__)(.*?)\1/g, "$2")
+    .replace(/(\*|_)(.*?)\1/g, "$2")
+    .replace(/^>\s?/gm, "")
+    .replace(/^[-*+]\s+/gm, "")
+    .replace(/^\d+\.\s+/gm, "")
+    .replace(/\|/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+
+  if (text.length <= maxLen) return text;
+  return `${text.slice(0, maxLen).trimEnd()}…`;
+}
+
 export function buildFolderTree(folders: string[]): Record<string, Record<string, unknown>> {
   const tree: Record<string, Record<string, unknown>> = {};
   for (const folder of folders) {

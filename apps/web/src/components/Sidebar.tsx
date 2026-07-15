@@ -50,40 +50,59 @@ export function Sidebar() {
         collapsed ? "w-16 p-2" : "w-64 p-4"
       }`}
     >
-      <Link
-        href="/"
-        className={`relative mb-6 flex items-center justify-center overflow-hidden ${collapsed ? "h-10" : "h-16"}`}
-        title="Home"
-      >
-        {!collapsed ? (
-          <>
-            <Image
-              src="/logo-light.png"
-              alt="OrangeCloud Knowledge Base"
-              width={200}
-              height={52}
-              priority
-              className={`absolute object-contain transition-opacity duration-300 ease-in-out ${
-                resolvedTheme === "light" ? "opacity-100" : "opacity-0"
-              }`}
-            />
-            <Image
-              src="/logo-dark.png"
-              alt="OrangeCloud Knowledge Base"
-              width={200}
-              height={52}
-              priority
-              className={`absolute object-contain transition-opacity duration-300 ease-in-out ${
-                resolvedTheme === "dark" ? "opacity-100" : "opacity-0"
-              }`}
-            />
-          </>
-        ) : (
-          <span className="text-lg font-bold text-accent">KB</span>
-        )}
-      </Link>
+      <div className={`mb-4 flex items-center ${collapsed ? "flex-col gap-2" : "justify-between gap-2"}`}>
+        <Link
+          href="/"
+          className={`relative flex items-center justify-center overflow-hidden ${collapsed ? "h-9 w-9" : "h-14 flex-1"}`}
+          title="Home"
+        >
+          {!collapsed ? (
+            <>
+              <Image
+                src="/logo-light.png"
+                alt="OrangeCloud Knowledge Base"
+                width={180}
+                height={48}
+                priority
+                className={`absolute object-contain transition-opacity duration-300 ease-in-out ${
+                  resolvedTheme === "light" ? "opacity-100" : "opacity-0"
+                }`}
+              />
+              <Image
+                src="/logo-dark.png"
+                alt="OrangeCloud Knowledge Base"
+                width={180}
+                height={48}
+                priority
+                className={`absolute object-contain transition-opacity duration-300 ease-in-out ${
+                  resolvedTheme === "dark" ? "opacity-100" : "opacity-0"
+                }`}
+              />
+            </>
+          ) : (
+            <span className="text-lg font-bold text-accent">KB</span>
+          )}
+        </Link>
 
-      <nav className="flex flex-1 flex-col gap-1">
+        <button
+          type="button"
+          onClick={toggleCollapsed}
+          className={`flex shrink-0 items-center justify-center rounded-lg border border-border bg-surface-elevated text-muted transition hover:border-accent/40 hover:text-accent ${
+            collapsed ? "h-9 w-9" : "h-9 gap-1.5 px-2.5"
+          }`}
+          title={collapsed ? t("sidebar.expand") : t("sidebar.collapse")}
+          aria-label={collapsed ? t("sidebar.expand") : t("sidebar.collapse")}
+        >
+          {collapsed ? <ChevronsRight size={16} /> : (
+            <>
+              <ChevronsLeft size={16} />
+              <span className="text-xs font-medium">{t("sidebar.collapse")}</span>
+            </>
+          )}
+        </button>
+      </div>
+
+      <nav className="flex flex-1 flex-col gap-1 overflow-y-auto">
         {links.map(({ href, label, icon: Icon, exact, matchNotes }) => {
           const active = isActive(href, exact, matchNotes);
           return (
@@ -107,18 +126,8 @@ export function Sidebar() {
         })}
       </nav>
 
-      <button
-        type="button"
-        onClick={toggleCollapsed}
-        className="mb-2 flex items-center justify-center rounded-lg p-2 text-muted transition hover:bg-surface-elevated hover:text-foreground"
-        title={collapsed ? t("sidebar.expand") : t("sidebar.collapse")}
-        aria-label={collapsed ? t("sidebar.expand") : t("sidebar.collapse")}
-      >
-        {collapsed ? <ChevronsRight size={18} /> : <ChevronsLeft size={18} />}
-      </button>
-
       {!collapsed && (
-        <div className="border-t border-border pt-3 px-2">
+        <div className="mt-3 border-t border-border pt-3 px-1">
           <p className="text-[10px] text-muted leading-relaxed">
             Built by <span className="text-foreground font-medium">Trinh Hoang Tu</span> &amp;{" "}
             <span className="text-foreground font-medium">Le Sy Cuong</span>

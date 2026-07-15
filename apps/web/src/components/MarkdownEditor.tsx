@@ -1,11 +1,12 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import dynamic from "next/dynamic";
 import { MarkdownRenderer } from "./MarkdownRenderer";
 import { api, API_URL } from "@/lib/api";
 import { useTheme } from "./ThemeProvider";
-import { ImagePlus, Loader2 } from "lucide-react";
+import { lintMarkdown } from "@/lib/markdown-lint";
+import { AlertTriangle, ImagePlus, Loader2 } from "lucide-react";
 import "@uiw/react-md-editor/markdown-editor.css";
 import "@uiw/react-markdown-preview/markdown.css";
 
@@ -22,6 +23,10 @@ export function MarkdownEditor({ value, onChange, placeholder }: MarkdownEditorP
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState("");
   const { resolvedTheme, mounted } = useTheme();
+
+  const issues = useMemo(() => lintMarkdown(value), [value]);
+  const errors = issues.filter((i) => i.severity === "error");
+  const warnings = issues.filter((i) => i.severity === "warning");
 
   const insertAtCursor = useCallback(
     (snippet: string) => {
@@ -75,20 +80,46 @@ export function MarkdownEditor({ value, onChange, placeholder }: MarkdownEditorP
           </button>
         </div>
 
-        <label className="mr-3 flex cursor-pointer items-center gap-2 text-sm text-muted hover:text-accent">
-          {uploading ? <Loader2 size={16} className="animate-spin" /> : <ImagePlus size={16} />}
-          {uploading ? "Uploading..." : "Attach file"}
-          <input
-            type="file"
-            className="hidden"
-            accept="image/*,.pdf,.txt,.md"
-            onChange={handleUpload}
-            disabled={uploading}
-          />
-        </label>
+        <div className="mr-3 flex items-center gap-3">
+          {issues.length > 0 && (
+            <span
+              className={`flex items-center gap-1 text-xs ${
+                errors.length ? "text-red-400" : "text-amber-500"
+              }`}
+              title={issues.map((i) => `L${i.line}: ${i.message}`).join("\n")}
+            >
+              <AlertTriangle size={14} />
+              {errors.length ? `${errors.length} lỗi` : `${warnings.length} cảnh báo`}
+            </span>
+          )}
+          <label className="flex cursor-pointer items-center gap-2 text-sm text-muted hover:text-accent">
+            {uploading ? <Loader2 size={16} className="animate-spin" /> : <ImagePlus size={16} />}
+            {uploading ? "Uploading..." : "Attach file"}
+            <input
+              type="file"
+              className="hidden"
+              accept="image/*,.pdf,.txt,.md"
+              onChange={handleUpload}
+              disabled={uploading}
+            />
+          </label>
+        </div>
       </div>
 
       {uploadError && <p className="border-b border-border px-4 py-2 text-sm text-red-500">{uploadError}</p>}
+
+      {issues.length > 0 && (
+        <ul className="max-h-28 space-y-1 overflow-y-auto border-b border-border px-4 py-2 text-xs">
+          {issues.map((issue, idx) => (
+            <li
+              key={`${issue.line}-${idx}`}
+              className={issue.severity === "error" ? "text-red-400" : "text-amber-500"}
+            >
+              Dòng {issue.line}: {issue.message}
+            </li>
+          ))}
+        </ul>
+      )}
 
       {tab === "write" ? (
         <div className="min-h-[500px] flex-1 [&_.w-md-editor]:min-h-[500px] [&_.w-md-editor]:bg-surface [&_.w-md-editor-toolbar]:bg-surface-elevated [&_.w-md-editor-toolbar]:border-border">

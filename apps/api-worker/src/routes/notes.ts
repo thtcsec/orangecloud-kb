@@ -33,6 +33,13 @@ notesRoutes.get("/meta/stats", async (c) => {
   return jsonResponse(stats);
 });
 
+notesRoutes.get("/:id/audit", async (c) => {
+  const note = await notesService.getNoteById(c.env.DB, c.req.param("id"));
+  if (!note) return errorResponse("Note not found", 404);
+  const audit = await notesService.listNoteAudit(c.env.DB, c.req.param("id"));
+  return jsonResponse(audit);
+});
+
 notesRoutes.get("/:id/comments", async (c) => {
   const note = await notesService.getNoteById(c.env.DB, c.req.param("id"));
   if (!note) return errorResponse("Note not found", 404);

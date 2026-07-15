@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import { api } from "@/lib/api";
 import { NoteCard } from "@/components/NoteCard";
+import { TagFilter } from "@/components/TagFilter";
 import { useI18n } from "@/lib/i18n";
 import { useToast } from "@/components/Toast";
 import { Search, ChevronLeft, Folder, FolderOpen, PanelLeftClose, PanelLeft, FolderInput, FolderPlus } from "lucide-react";
@@ -154,30 +155,12 @@ export default function NotesPage() {
           />
         </div>
 
-        {/* Tags */}
-        {tags.length > 0 && (
-          <div className="mb-4 flex flex-wrap gap-2">
-            <button
-              type="button"
-              onClick={() => setSelectedTag(undefined)}
-              className={`rounded-full px-3 py-1 text-xs transition-colors ${!selectedTag ? "bg-accent text-black" : "bg-surface-elevated text-muted hover:text-foreground"}`}
-            >
-              {t("folders.allTags")}
-            </button>
-            {tags.map((tag) => (
-              <button
-                key={tag}
-                type="button"
-                onClick={() => setSelectedTag(tag)}
-                className={`rounded-full px-3 py-1 text-xs transition-colors ${
-                  selectedTag === tag ? "bg-accent text-black" : "bg-surface-elevated text-muted hover:text-foreground"
-                }`}
-              >
-                {tag}
-              </button>
-            ))}
-          </div>
-        )}
+        <TagFilter
+          tags={tags}
+          selectedTag={selectedTag}
+          onSelect={setSelectedTag}
+          allLabel={t("folders.allTags")}
+        />
 
         {loading ? (
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3 stagger-children">

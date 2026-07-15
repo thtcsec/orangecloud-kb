@@ -1,4 +1,13 @@
-import type { ChatResponse, Comment, CommentInput, Note, NoteInput, SearchResult, ChatMessage } from "@kb/shared";
+import type {
+  ChatResponse,
+  Comment,
+  CommentInput,
+  Note,
+  NoteAudit,
+  NoteInput,
+  SearchResult,
+  ChatMessage,
+} from "@kb/shared";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8787";
 
@@ -60,6 +69,7 @@ export const api = {
       request<{ total: number; published: number; drafts: number; comments: number }>(
         "/api/notes/meta/stats",
       ),
+    audit: (id: string) => request<NoteAudit[]>(`/api/notes/${id}/audit`),
   },
   comments: {
     list: (noteId: string) => request<Comment[]>(`/api/notes/${noteId}/comments`),

@@ -8,22 +8,35 @@ import { parseTags } from "@/lib/utils";
 import { MarkdownRenderer } from "@/components/MarkdownRenderer";
 import { CommentsSection } from "@/components/CommentsSection";
 import { ClientDate } from "@/components/ClientDate";
-import type { Comment, Note } from "@kb/shared";
-import { Pencil, Trash2, ChevronLeft } from "lucide-react";
+import type { Comment, Note, NoteAudit } from "@kb/shared";
+import { Pencil, Trash2, ChevronLeft, History } from "lucide-react";
+
+const ACTION_LABEL: Record<NoteAudit["action"], string> = {
+  created: "Tạo mới",
+  updated: "Chỉnh sửa",
+  published: "Xuất bản",
+  unpublished: "Hủy xuất bản",
+};
 
 export default function NoteDetailPage() {
   const params = useParams();
   const id = params.id as string;
   const [note, setNote] = useState<Note | null>(null);
   const [comments, setComments] = useState<Comment[]>([]);
+  const [audit, setAudit] = useState<NoteAudit[]>([]);
   const [error, setError] = useState("");
   const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
-    Promise.all([api.notes.get(id), api.comments.list(id)])
-      .then(([n, c]) => {
+    Promise.all([
+      api.notes.get(id),
+      api.comments.list(id),
+      api.notes.audit(id).catch(() => [] as NoteAudit[]),
+    ])
+      .then(([n, c, a]) => {
         setNote(n);
         setComments(c);
+        setAudit(a);
       })
       .catch((err) => setError(err instanceof Error ? err.message : "Không thể tải ghi chú"));
   }, [id]);
@@ -59,7 +72,6 @@ export default function NoteDetailPage() {
 
   return (
     <article className="mx-auto max-w-4xl p-6">
-      {/* Back button */}
       <Link href="/notes" className="mb-4 inline-flex items-center gap-1 text-sm text-muted hover:text-foreground transition-colors">
         <ChevronLeft size={16} /> Quay lại danh sách
       </Link>
@@ -69,8 +81,6 @@ export default function NoteDetailPage() {
             <h1 className="text-3xl font-bold">{note.title}</h1>
             <div className="mt-2 flex flex-wrap items-center gap-2 text-sm text-muted">
               <span>{note.author}</span>
-              <span>·</span>
-              <ClientDate iso={note.updated_at} />
               {note.folder && (
                 <>
                   <span>·</span>
@@ -85,6 +95,14 @@ export default function NoteDetailPage() {
                 }`}
               >
                 {note.status === "published" ? "Đã xuất bản" : "Bản nháp"}
+              </span>
+            </div>
+            <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted">
+              <span>
+                Tạo lần đầu: <ClientDate iso={note.created_at} />
+              </span>
+              <span>
+                Sửa gần nhất: <ClientDate iso={note.updated_at} />
               </span>
             </div>
           </div>
@@ -119,6 +137,31 @@ export default function NoteDetailPage() {
       </header>
 
       <MarkdownRenderer content={note.content} />
+
+      {audit.length > 0 && (
+        <section className="mt-10 rounded-xl border border-border bg-surface p-4">
+          <h2 className="mb-3 flex items-center gap-2 text-sm font-semibold">
+            <History size={16} className="text-accent" />
+            Lịch sử thay đổi
+          </h2>
+          <ol className="space-y-2 border-l border-border pl-4">
+            {audit.map((entry) => (
+              <li key={entry.id} className="relative text-sm">
+                <span className="absolute -left-[21px] top-1.5 h-2.5 w-2.5 rounded-full bg-accent" />
+                <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
+                  <span className="font-medium text-foreground">{ACTION_LABEL[entry.action]}</span>
+                  <span className="text-xs text-muted">
+                    <ClientDate iso={entry.created_at} />
+                  </span>
+                  {entry.author && <span className="text-xs text-muted">· {entry.author}</span>}
+                </div>
+                {entry.summary && <p className="text-xs text-muted">{entry.summary}</p>}
+              </li>
+            ))}
+          </ol>
+        </section>
+      )}
+
       <CommentsSection noteId={id} initialComments={comments} />
     </article>
   );

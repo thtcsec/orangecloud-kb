@@ -76,6 +76,9 @@ const translations = {
     "settings.themeDesc": "Chọn chế độ hiển thị phù hợp với bạn.",
     "settings.language": "Ngôn ngữ",
     "settings.languageDesc": "Chọn ngôn ngữ hiển thị.",
+    "settings.scrollTop": "Cuộn lên đầu trang",
+    "settings.scrollTopDesc": "Hiện nút Scroll to top khi note hoặc trang dài — có thể tắt nếu không cần.",
+    "settings.scrollTopToggle": "Bật nút Scroll to top",
 
     // Comments
     "comments.title": "Bình luận",
@@ -170,6 +173,9 @@ const translations = {
     "settings.themeDesc": "Choose your preferred display mode.",
     "settings.language": "Language",
     "settings.languageDesc": "Choose display language.",
+    "settings.scrollTop": "Scroll to top",
+    "settings.scrollTopDesc": "Show a scroll-to-top button on long pages — turn off if you prefer a cleaner UI.",
+    "settings.scrollTopToggle": "Enable scroll-to-top button",
 
     // Comments
     "comments.title": "Comments",

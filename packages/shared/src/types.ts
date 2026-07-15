@@ -47,6 +47,18 @@ export interface NoteListQuery {
   q?: string;
 }
 
+export type NoteAuditAction = "created" | "updated" | "published" | "unpublished";
+
+export interface NoteAudit {
+  id: string;
+  note_id: string;
+  action: NoteAuditAction;
+  author: string | null;
+  status: NoteStatus | null;
+  summary: string | null;
+  created_at: string;
+}
+
 export interface ChatMessage {
   role: "user" | "assistant";
   content: string;

@@ -1,18 +1,19 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { api } from "@/lib/api";
 import { MarkdownEditor } from "@/components/MarkdownEditor";
 import { FolderSelect } from "@/components/FolderSelect";
+import { StatusRadio } from "@/components/StatusRadio";
 import { useI18n } from "@/lib/i18n";
+import { readLastAuthor, writeLastAuthor } from "@/lib/preferences";
 import { Upload, FileText, CheckCircle, XCircle, PenLine } from "lucide-react";
 
 type Mode = "write" | "import";
 
 export default function NewNotePage() {
   const { t } = useI18n();
-  const router = useRouter();
   const [mode, setMode] = useState<Mode>("write");
 
   return (
@@ -21,7 +22,6 @@ export default function NewNotePage() {
         <h1 className="text-2xl font-bold">{t("notes.new")}</h1>
       </header>
 
-      {/* Mode toggle */}
       <div className="mb-6 flex gap-2">
         <button
           type="button"
@@ -60,11 +60,20 @@ function WriteMode() {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [author, setAuthor] = useState("");
+  const [suggestedAuthor, setSuggestedAuthor] = useState("");
   const [tags, setTags] = useState("");
   const [folder, setFolder] = useState("");
   const [status, setStatus] = useState<"draft" | "published">("draft");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const last = readLastAuthor();
+    if (last) {
+      setAuthor(last);
+      setSuggestedAuthor(last);
+    }
+  }, []);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -72,6 +81,7 @@ function WriteMode() {
     setError("");
 
     try {
+      writeLastAuthor(author);
       const note = await api.notes.create({ title, content, author, tags, folder, status });
       router.push(`/notes/${note.id}`);
     } catch (err) {
@@ -85,13 +95,33 @@ function WriteMode() {
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="grid gap-4 md:grid-cols-2">
         <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder={t("notes.titleField")} required className="w-full" />
-        <input value={author} onChange={(e) => setAuthor(e.target.value)} placeholder={t("notes.author")} required className="w-full" />
+        <div>
+          <input
+            value={author}
+            onChange={(e) => setAuthor(e.target.value)}
+            placeholder={t("notes.author")}
+            required
+            className="w-full"
+            list="author-suggestions"
+          />
+          <datalist id="author-suggestions">
+            {suggestedAuthor && <option value={suggestedAuthor} />}
+          </datalist>
+          {suggestedAuthor && author === suggestedAuthor && (
+            <p className="mt-1 text-[11px] text-muted">Đề xuất từ lần nhập trước — bạn có thể sửa</p>
+          )}
+        </div>
         <FolderSelect value={folder} onChange={setFolder} />
         <input value={tags} onChange={(e) => setTags(e.target.value)} placeholder={t("notes.tags")} className="w-full" />
-        <select value={status} onChange={(e) => setStatus(e.target.value as "draft" | "published")} className="w-full">
-          <option value="draft">{t("notes.draft")}</option>
-          <option value="published">{t("notes.publish")}</option>
-        </select>
+        <div className="md:col-span-2 rounded-lg border border-border bg-surface px-4 py-3">
+          <p className="mb-2 text-xs font-medium text-muted">Trạng thái</p>
+          <StatusRadio
+            value={status}
+            onChange={setStatus}
+            draftLabel={t("notes.draft")}
+            publishLabel={t("notes.publish")}
+          />
+        </div>
       </div>
 
       <MarkdownEditor value={content} onChange={setContent} placeholder={t("notes.contentPlaceholder")} />
@@ -121,6 +151,10 @@ function ImportMode() {
   const [author, setAuthor] = useState("");
   const [error, setError] = useState("");
 
+  useEffect(() => {
+    setAuthor(readLastAuthor());
+  }, []);
+
   const processFiles = useCallback(
     async (files: FileList | File[]) => {
       if (!author.trim()) {
@@ -128,6 +162,7 @@ function ImportMode() {
         return;
       }
 
+      writeLastAuthor(author);
       setProcessing(true);
       setResults([]);
       setError("");
@@ -189,7 +224,6 @@ function ImportMode() {
 
   return (
     <div className="space-y-6">
-      {/* Author field */}
       <div>
         <label className="mb-2 block text-sm font-medium">{t("notes.author")}</label>
         <input
@@ -197,12 +231,15 @@ function ImportMode() {
           onChange={(e) => setAuthor(e.target.value)}
           placeholder="Tên tác giả cho các ghi chú import"
           className="w-full max-w-md"
+          list="author-suggestions-import"
         />
+        <datalist id="author-suggestions-import">
+          {readLastAuthor() && <option value={readLastAuthor()} />}
+        </datalist>
       </div>
 
       {error && <p className="text-sm text-red-400">{error}</p>}
 
-      {/* Drop zone */}
       <div
         onDragOver={(e) => {
           e.preventDefault();
@@ -230,7 +267,6 @@ function ImportMode() {
         />
       </div>
 
-      {/* Processing indicator */}
       {processing && (
         <div className="flex items-center gap-3 rounded-lg border border-accent/30 bg-accent/5 p-4 animate-fade-in">
           <div className="h-5 w-5 animate-spin rounded-full border-2 border-accent border-t-transparent" />
@@ -246,7 +282,6 @@ function ImportMode() {
         </div>
       )}
 
-      {/* Results */}
       {results.length > 0 && (
         <div className="space-y-2 animate-fade-up">
           <p className="text-sm font-medium">

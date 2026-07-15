@@ -57,13 +57,21 @@ export function NoteCard({ note, draggable }: NoteCardProps) {
         <p className="mb-3 line-clamp-2 text-sm text-muted">{note.content.slice(0, 160)}...</p>
         <div className="flex flex-wrap items-center gap-2 text-xs text-muted">
           <span>{note.author}</span>
-          <span>·</span>
-          <ClientDate iso={note.updated_at} />
           {note.folder && (
             <>
               <span>·</span>
               <span className="text-accent/80">{note.folder}</span>
             </>
+          )}
+        </div>
+        <div className="mt-1 flex flex-wrap gap-x-3 gap-y-0.5 text-[11px] text-muted/90">
+          <span>
+            Tạo: <ClientDate iso={note.created_at} />
+          </span>
+          {note.updated_at !== note.created_at && (
+            <span>
+              Sửa: <ClientDate iso={note.updated_at} />
+            </span>
           )}
         </div>
         {tags.length > 0 && (

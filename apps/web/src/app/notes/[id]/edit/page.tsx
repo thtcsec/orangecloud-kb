@@ -5,6 +5,8 @@ import { useParams, useRouter } from "next/navigation";
 import { api } from "@/lib/api";
 import { MarkdownEditor } from "@/components/MarkdownEditor";
 import { FolderSelect } from "@/components/FolderSelect";
+import { StatusRadio } from "@/components/StatusRadio";
+import { writeLastAuthor } from "@/lib/preferences";
 import type { Note } from "@kb/shared";
 
 export default function EditNotePage() {
@@ -43,6 +45,7 @@ export default function EditNotePage() {
     setError("");
 
     try {
+      writeLastAuthor(author);
       await api.notes.update(id, { title, content, author, tags, folder, status });
       router.push(`/notes/${id}`);
     } catch (err) {
@@ -58,6 +61,11 @@ export default function EditNotePage() {
     <div className="p-6">
       <header className="mb-6">
         <h1 className="text-2xl font-bold">Chỉnh sửa ghi chú</h1>
+        {note && (
+          <p className="mt-1 text-xs text-muted">
+            Ngày tạo gốc được giữ nguyên khi lưu / xuất bản — chỉ cập nhật ngày sửa.
+          </p>
+        )}
       </header>
 
       <form onSubmit={handleSubmit} className="space-y-4">
@@ -66,10 +74,15 @@ export default function EditNotePage() {
           <input value={author} onChange={(e) => setAuthor(e.target.value)} placeholder="Tác giả" required className="w-full" />
           <FolderSelect value={folder} onChange={setFolder} />
           <input value={tags} onChange={(e) => setTags(e.target.value)} placeholder="Tags" className="w-full" />
-          <select value={status} onChange={(e) => setStatus(e.target.value as "draft" | "published")} className="w-full">
-            <option value="draft">Bản nháp</option>
-            <option value="published">Xuất bản</option>
-          </select>
+          <div className="md:col-span-2 rounded-lg border border-border bg-surface px-4 py-3">
+            <p className="mb-2 text-xs font-medium text-muted">Trạng thái</p>
+            <StatusRadio
+              value={status}
+              onChange={setStatus}
+              draftLabel="Bản nháp"
+              publishLabel="Xuất bản"
+            />
+          </div>
         </div>
 
         <MarkdownEditor value={content} onChange={setContent} />

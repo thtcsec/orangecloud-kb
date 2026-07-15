@@ -1,6 +1,43 @@
-import type { Note, NoteInput, NoteListQuery } from "@kb/shared";
+import type { Note, NoteAudit, NoteAuditAction, NoteInput, NoteListQuery } from "@kb/shared";
 import type { Env } from "../env";
 import { escapeFtsQuery, generateId, nowIso } from "../lib/utils";
+
+async function writeAudit(
+  db: D1Database,
+  noteId: string,
+  action: NoteAuditAction,
+  author: string | null,
+  status: Note["status"] | null,
+  summary: string | null,
+): Promise<void> {
+  try {
+    await db
+      .prepare(
+        `INSERT INTO note_audit (id, note_id, action, author, status, summary, created_at)
+         VALUES (?, ?, ?, ?, ?, ?, ?)`,
+      )
+      .bind(generateId(), noteId, action, author, status, summary, nowIso())
+      .run();
+  } catch (err) {
+    // Table may not exist until migration runs — never fail primary write
+    console.warn("note_audit write skipped:", err);
+  }
+}
+
+export async function listNoteAudit(db: D1Database, noteId: string): Promise<NoteAudit[]> {
+  try {
+    const result = await db
+      .prepare(
+        `SELECT id, note_id, action, author, status, summary, created_at
+         FROM note_audit WHERE note_id = ? ORDER BY created_at DESC`,
+      )
+      .bind(noteId)
+      .all<NoteAudit>();
+    return result.results ?? [];
+  } catch {
+    return [];
+  }
+}
 
 export async function listNotes(db: D1Database, query: NoteListQuery): Promise<Note[]> {
   const conditions: string[] = [];
@@ -84,6 +121,18 @@ export async function createNote(db: D1Database, input: NoteInput): Promise<Note
     )
     .run();
 
+  await writeAudit(
+    db,
+    note.id,
+    "created",
+    note.author,
+    note.status,
+    `Tạo ghi chú "${note.title}" (${note.status})`,
+  );
+  if (note.status === "published") {
+    await writeAudit(db, note.id, "published", note.author, note.status, "Xuất bản lần đầu");
+  }
+
   return note;
 }
 
@@ -95,6 +144,7 @@ export async function updateNote(
   const existing = await getNoteById(db, id);
   if (!existing) return null;
 
+  // created_at is intentionally preserved — only updated_at changes on edit/publish
   const updated: Note = {
     ...existing,
     title: input.title?.trim() ?? existing.title,
@@ -103,6 +153,7 @@ export async function updateNote(
     tags: input.tags !== undefined ? input.tags.trim() || null : existing.tags,
     folder: input.folder !== undefined ? input.folder.trim() || null : existing.folder,
     status: input.status ?? existing.status,
+    created_at: existing.created_at,
     updated_at: nowIso(),
   };
 
@@ -122,6 +173,29 @@ export async function updateNote(
       id,
     )
     .run();
+
+  const changes: string[] = [];
+  if (updated.title !== existing.title) changes.push("tiêu đề");
+  if (updated.content !== existing.content) changes.push("nội dung");
+  if (updated.author !== existing.author) changes.push("tác giả");
+  if (updated.tags !== existing.tags) changes.push("tags");
+  if (updated.folder !== existing.folder) changes.push("thư mục");
+  if (updated.status !== existing.status) changes.push(`trạng thái → ${updated.status}`);
+
+  await writeAudit(
+    db,
+    id,
+    "updated",
+    updated.author,
+    updated.status,
+    changes.length ? `Cập nhật: ${changes.join(", ")}` : "Cập nhật ghi chú",
+  );
+
+  if (existing.status !== "published" && updated.status === "published") {
+    await writeAudit(db, id, "published", updated.author, updated.status, "Xuất bản");
+  } else if (existing.status === "published" && updated.status === "draft") {
+    await writeAudit(db, id, "unpublished", updated.author, updated.status, "Hủy xuất bản → bản nháp");
+  }
 
   return updated;
 }
